@@ -69,5 +69,30 @@ class YahooFinanceService {
     return results;
   }
 
+  /// Scrapes Chinese stock name from Yahoo Taiwan for TW/TWO symbols.
+  /// Title format: "路易莎咖啡(2758.TWO) 走勢圖 - Yahoo股市"
+  Future<String?> getChineseNameFromYahooTw(String code) async {
+    for (final suffix in ['TWO', 'TW']) {
+      try {
+        final uri =
+            Uri.parse('https://tw.stock.yahoo.com/quote/$code.$suffix');
+        final response = await _client.get(uri, headers: {
+          'User-Agent': 'Mozilla/5.0',
+        });
+        if (response.statusCode != 200) continue;
+
+        final match = RegExp(r'<title>(.+?)\(' + RegExp.escape(code) + r'\.')
+            .firstMatch(response.body);
+        if (match != null) {
+          final name = match.group(1)?.trim();
+          if (name != null && name.isNotEmpty) return name;
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  }
+
   void dispose() => _client.close();
 }

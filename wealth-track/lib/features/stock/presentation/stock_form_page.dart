@@ -85,9 +85,22 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
 
       if (resolvedName == null) {
         final yahoo = ref.read(yahooFinanceServiceProvider);
+
+        // Try .TW first, then .TWO for 上櫃/興櫃
         final yahooSym = toYahooSymbol(symbol, widget.market);
-        final quote = await yahoo.getQuote(yahooSym);
-        resolvedName = quote?.shortName;
+        var quote = await yahoo.getQuote(yahooSym);
+
+        if (quote == null && _isTw) {
+          quote = await yahoo.getQuote('$symbol.TWO');
+        }
+
+        if (quote != null && _isTw) {
+          // Chart API returns English names; scrape Yahoo TW for Chinese
+          final chName = await yahoo.getChineseNameFromYahooTw(symbol);
+          resolvedName = chName ?? quote.shortName;
+        } else {
+          resolvedName = quote?.shortName;
+        }
 
         if (quote == null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

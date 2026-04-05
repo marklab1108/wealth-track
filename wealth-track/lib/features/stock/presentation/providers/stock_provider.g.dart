@@ -78,7 +78,7 @@ final allStockAssetsProvider =
 // ignore: unused_element
 typedef AllStockAssetsRef = AutoDisposeStreamProviderRef<List<StockAsset>>;
 String _$refreshStockPricesHash() =>
-    r'e8dd782101baf977721204247b2f78798e9cdb00';
+    r'9037a2b77c67aa9e1f85116c67bc408f713db4af';
 
 /// See also [refreshStockPrices].
 @ProviderFor(refreshStockPrices)

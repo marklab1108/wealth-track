@@ -82,17 +82,35 @@ Future<RefreshResult> refreshStockPrices(RefreshStockPricesRef ref) async {
         twCodes.where((c) => misQuotes[c]?.price == null).toList();
     if (twMissing.isNotEmpty) {
       final yahoo = ref.read(yahooFinanceServiceProvider);
-      final yahooSymbols = twMissing.map((c) => '$c.TW').toList();
-      final yahooPrices = await yahoo.getPrices(yahooSymbols);
 
+      // Try .TW first (上市)
+      final twSymbols = twMissing.map((c) => '$c.TW').toList();
+      final twPrices = await yahoo.getPrices(twSymbols);
+
+      final stillMissing = <String>[];
       for (final code in twMissing) {
-        final yahooKey = '$code.TW';
-        final price = yahooPrices[yahooKey];
+        final price = twPrices['$code.TW'];
         if (price != null) {
           await repo.updatePriceBySymbol(code, price);
           totalUpdated++;
         } else {
-          allFailed.add(code);
+          stillMissing.add(code);
+        }
+      }
+
+      // Try .TWO for remaining (上櫃/興櫃)
+      if (stillMissing.isNotEmpty) {
+        final twoSymbols = stillMissing.map((c) => '$c.TWO').toList();
+        final twoPrices = await yahoo.getPrices(twoSymbols);
+
+        for (final code in stillMissing) {
+          final price = twoPrices['$code.TWO'];
+          if (price != null) {
+            await repo.updatePriceBySymbol(code, price);
+            totalUpdated++;
+          } else {
+            allFailed.add(code);
+          }
         }
       }
     }
