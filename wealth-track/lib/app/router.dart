@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../core/models/asset.dart';
 import '../features/cash/presentation/cash_form_page.dart';
 import '../features/dashboard/presentation/assets_tab_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
@@ -47,6 +48,18 @@ final router = GoRouter(
                   path: 'stock/edit/:id',
                   builder: (context, state) => StockFormPage(
                     editId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'tw-stock/add',
+                  builder: (context, state) =>
+                      const StockFormPage(market: StockMarket.tw),
+                ),
+                GoRoute(
+                  path: 'tw-stock/edit/:id',
+                  builder: (context, state) => StockFormPage(
+                    editId: state.pathParameters['id'],
+                    market: StockMarket.tw,
                   ),
                 ),
               ],

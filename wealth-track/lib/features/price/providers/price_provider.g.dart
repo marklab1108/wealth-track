@@ -42,6 +42,40 @@ final exchangeRateServiceProvider = Provider<ExchangeRateService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ExchangeRateServiceRef = ProviderRef<ExchangeRateService>;
+String _$twseMisServiceHash() => r'12aee4cd03e41653ad6013722287f75e3797042f';
+
+/// See also [twseMisService].
+@ProviderFor(twseMisService)
+final twseMisServiceProvider = Provider<TwseMisService>.internal(
+  twseMisService,
+  name: r'twseMisServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$twseMisServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TwseMisServiceRef = ProviderRef<TwseMisService>;
+String _$twseServiceHash() => r'e39a01ffdd414cf196567ddd9fa99fa6e593aaae';
+
+/// See also [twseService].
+@ProviderFor(twseService)
+final twseServiceProvider = Provider<TwseService>.internal(
+  twseService,
+  name: r'twseServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$twseServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TwseServiceRef = ProviderRef<TwseService>;
 String _$exchangeRateRepositoryHash() =>
     r'43310339fa01bb4351b877da8c0d7f29b3868be3';
 

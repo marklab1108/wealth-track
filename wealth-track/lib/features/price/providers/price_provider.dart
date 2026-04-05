@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/providers/database_provider.dart';
 import '../data/exchange_rate_repository.dart';
 import '../data/exchange_rate_service.dart';
+import '../data/twse_mis_service.dart';
+import '../data/twse_service.dart';
 import '../data/yahoo_finance_service.dart';
 
 part 'price_provider.g.dart';
@@ -17,6 +19,20 @@ YahooFinanceService yahooFinanceService(YahooFinanceServiceRef ref) {
 @Riverpod(keepAlive: true)
 ExchangeRateService exchangeRateService(ExchangeRateServiceRef ref) {
   final svc = ExchangeRateService();
+  ref.onDispose(() => svc.dispose());
+  return svc;
+}
+
+@Riverpod(keepAlive: true)
+TwseMisService twseMisService(TwseMisServiceRef ref) {
+  final svc = TwseMisService();
+  ref.onDispose(() => svc.dispose());
+  return svc;
+}
+
+@Riverpod(keepAlive: true)
+TwseService twseService(TwseServiceRef ref) {
+  final svc = TwseService();
   ref.onDispose(() => svc.dispose());
   return svc;
 }

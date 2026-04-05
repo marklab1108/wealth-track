@@ -40,12 +40,20 @@ Future<Map<String, double>> assetAllocation(AssetAllocationRef ref) async {
 
   if (stockList.isNotEmpty) {
     final usdToTwd = await ref.watch(usdToTwdProvider.future);
-    final stockTotalTWD = stockList.fold<double>(0.0, (sum, s) {
+
+    double usTotal = 0;
+    double twTotal = 0;
+    for (final s in stockList) {
       final mv = s.marketValue;
-      if (s.market == StockMarket.us) return sum + mv * usdToTwd;
-      return sum + mv;
-    });
-    if (stockTotalTWD > 0) result['美股'] = stockTotalTWD;
+      if (s.market == StockMarket.us) {
+        usTotal += mv * usdToTwd;
+      } else {
+        twTotal += mv;
+      }
+    }
+
+    if (usTotal > 0) result['美股'] = usTotal;
+    if (twTotal > 0) result['台股'] = twTotal;
   }
 
   return result;
@@ -58,15 +66,16 @@ double cashTotalValue(CashTotalValueRef ref) {
 }
 
 @riverpod
-Future<double> stockTotalValueTWD(StockTotalValueTWDRef ref) async {
-  final list =
-      ref.watch(allStockAssetsProvider).valueOrNull ?? <StockAsset>[];
+Future<double> usStockTotalTWD(UsStockTotalTWDRef ref) async {
+  final list = ref.watch(stockAssetsProvider).valueOrNull ?? <StockAsset>[];
   if (list.isEmpty) return 0;
 
   final usdToTwd = await ref.watch(usdToTwdProvider.future);
-  return list.fold<double>(0.0, (sum, s) {
-    final mv = s.marketValue;
-    if (s.market == StockMarket.us) return sum + mv * usdToTwd;
-    return sum + mv;
-  });
+  return list.fold<double>(0.0, (sum, s) => sum + s.marketValue * usdToTwd);
+}
+
+@riverpod
+double twStockTotal(TwStockTotalRef ref) {
+  final list = ref.watch(twStockAssetsProvider).valueOrNull ?? <StockAsset>[];
+  return list.fold(0.0, (sum, s) => sum + s.marketValue);
 }

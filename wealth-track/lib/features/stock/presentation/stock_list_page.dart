@@ -10,18 +10,30 @@ import 'refresh_helper.dart';
 
 class StockListPage extends ConsumerWidget {
   final bool showAppBar;
+  final StockMarket market;
 
-  const StockListPage({super.key, this.showAppBar = true});
+  const StockListPage({
+    super.key,
+    this.showAppBar = true,
+    this.market = StockMarket.us,
+  });
+
+  bool get _isTw => market == StockMarket.tw;
+  String get _title => _isTw ? '台股持倉' : '美股持倉';
+  String get _emptyLabel => _isTw ? '還沒有任何台股持倉' : '還沒有任何美股持倉';
+  String get _routePrefix => _isTw ? '/assets/tw-stock' : '/assets/stock';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stocksAsync = ref.watch(stockAssetsProvider);
+    final stocksAsync = _isTw
+        ? ref.watch(twStockAssetsProvider)
+        : ref.watch(stockAssetsProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: showAppBar
           ? AppBar(
-              title: const Text('美股持倉'),
+              title: Text(_title),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.refresh),
@@ -36,11 +48,11 @@ class StockListPage extends ConsumerWidget {
         error: (e, _) => Center(child: Text('載入失敗: $e')),
         data: (list) {
           if (list.isEmpty) return _buildEmpty(theme);
-          return _buildList(context, ref, list, theme);
+          return _buildList(context, list);
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/assets/stock/add'),
+        onPressed: () => context.push('$_routePrefix/add'),
         child: const Icon(Icons.add),
       ),
     );
@@ -58,7 +70,7 @@ class StockListPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '還沒有任何美股持倉',
+            _emptyLabel,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -77,22 +89,24 @@ class StockListPage extends ConsumerWidget {
 
   Widget _buildList(
     BuildContext context,
-    WidgetRef ref,
     List<StockAsset> list,
-    ThemeData theme,
   ) {
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 88),
       itemCount: list.length,
-      itemBuilder: (context, i) => _StockTile(asset: list[i]),
+      itemBuilder: (context, i) => _StockTile(
+        asset: list[i],
+        routePrefix: _routePrefix,
+      ),
     );
   }
 }
 
 class _StockTile extends ConsumerWidget {
   final StockAsset asset;
+  final String routePrefix;
 
-  const _StockTile({required this.asset});
+  const _StockTile({required this.asset, required this.routePrefix});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,6 +115,8 @@ class _StockTile extends ConsumerWidget {
     final staleLabel = stalenessLabel(staleness);
     final returnPct = formatPercent(asset.returnRate);
     final isPositive = asset.returnRate >= 0;
+    final isTw = asset.market == StockMarket.tw;
+    final currencyPrefix = isTw ? 'NT\$' : '\$';
 
     return Dismissible(
       key: ValueKey(asset.id),
@@ -169,14 +185,14 @@ class _StockTile extends ConsumerWidget {
           ],
         ),
         subtitle: Text(
-          '${asset.symbol} · ${asset.shares} 股 · 均價 \$${formatAmount(asset.avgCost)}',
+          '${asset.symbol} · ${asset.shares} 股 · 均價 $currencyPrefix${formatAmount(asset.avgCost)}',
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '\$${formatAmount(asset.currentPrice ?? asset.avgCost)}',
+              '$currencyPrefix${formatAmount(asset.currentPrice ?? asset.avgCost)}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -192,7 +208,7 @@ class _StockTile extends ConsumerWidget {
             ),
           ],
         ),
-        onTap: () => context.push('/assets/stock/edit/${asset.id}'),
+        onTap: () => context.push('$routePrefix/edit/${asset.id}'),
       ),
     );
   }

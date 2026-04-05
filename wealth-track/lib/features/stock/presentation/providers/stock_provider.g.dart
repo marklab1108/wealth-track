@@ -41,6 +41,24 @@ final stockAssetsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StockAssetsRef = AutoDisposeStreamProviderRef<List<StockAsset>>;
+String _$twStockAssetsHash() => r'2521a93837a544acfe434c6b37d6065d5521c633';
+
+/// See also [twStockAssets].
+@ProviderFor(twStockAssets)
+final twStockAssetsProvider =
+    AutoDisposeStreamProvider<List<StockAsset>>.internal(
+      twStockAssets,
+      name: r'twStockAssetsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$twStockAssetsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TwStockAssetsRef = AutoDisposeStreamProviderRef<List<StockAsset>>;
 String _$allStockAssetsHash() => r'a454d45d143e7cb5d696df4063c2338431ca6d2e';
 
 /// See also [allStockAssets].
@@ -60,7 +78,7 @@ final allStockAssetsProvider =
 // ignore: unused_element
 typedef AllStockAssetsRef = AutoDisposeStreamProviderRef<List<StockAsset>>;
 String _$refreshStockPricesHash() =>
-    r'2708568e6863d0d4913053606fdcd16300a8c8d2';
+    r'e8dd782101baf977721204247b2f78798e9cdb00';
 
 /// See also [refreshStockPrices].
 @ProviderFor(refreshStockPrices)

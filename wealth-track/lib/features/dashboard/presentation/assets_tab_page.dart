@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/models/asset.dart';
 import '../../cash/presentation/cash_list_page.dart';
 import '../../stock/presentation/refresh_helper.dart';
 import '../../stock/presentation/stock_list_page.dart';
@@ -19,7 +20,7 @@ class _AssetsTabPageState extends ConsumerState<AssetsTabPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() => setState(() {}));
   }
 
@@ -32,7 +33,7 @@ class _AssetsTabPageState extends ConsumerState<AssetsTabPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isStockTab = _tabController.index == 1;
+    final isStockTab = _tabController.index >= 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,6 +51,7 @@ class _AssetsTabPageState extends ConsumerState<AssetsTabPage>
           tabs: const [
             Tab(text: '現金'),
             Tab(text: '美股'),
+            Tab(text: '台股'),
           ],
           labelColor: theme.colorScheme.primary,
           indicatorColor: theme.colorScheme.primary,
@@ -59,7 +61,8 @@ class _AssetsTabPageState extends ConsumerState<AssetsTabPage>
         controller: _tabController,
         children: const [
           CashListPage(showAppBar: false),
-          StockListPage(showAppBar: false),
+          StockListPage(showAppBar: false, market: StockMarket.us),
+          StockListPage(showAppBar: false, market: StockMarket.tw),
         ],
       ),
     );

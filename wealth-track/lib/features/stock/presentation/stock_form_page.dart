@@ -12,8 +12,13 @@ const _uuid = Uuid();
 
 class StockFormPage extends ConsumerStatefulWidget {
   final String? editId;
+  final StockMarket market;
 
-  const StockFormPage({super.key, this.editId});
+  const StockFormPage({
+    super.key,
+    this.editId,
+    this.market = StockMarket.us,
+  });
 
   @override
   ConsumerState<StockFormPage> createState() => _StockFormPageState();
@@ -32,6 +37,12 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
   String _lastLookedUpSymbol = '';
 
   bool get isEditing => widget.editId != null;
+  bool get _isTw => widget.market == StockMarket.tw;
+
+  String get _appBarTitle {
+    final action = isEditing ? '編輯' : '新增';
+    return _isTw ? '$action台股' : '$action美股';
+  }
 
   @override
   void initState() {
@@ -57,22 +68,41 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
     _lastLookedUpSymbol = symbol;
 
     try {
-      final yahoo = ref.read(yahooFinanceServiceProvider);
-      final quote = await yahoo.getQuote(symbol);
+      String? resolvedName;
+
+      if (_isTw) {
+        // MIS API: covers 上市、上櫃、ETF — returns Chinese name
+        final mis = ref.read(twseMisServiceProvider);
+        final quote = await mis.getQuote(symbol);
+        resolvedName = quote?.name;
+
+        // Fallback: TWSE company list (上市 only)
+        if (resolvedName == null) {
+          final twse = ref.read(twseServiceProvider);
+          resolvedName = await twse.getChineseName(symbol);
+        }
+      }
+
+      if (resolvedName == null) {
+        final yahoo = ref.read(yahooFinanceServiceProvider);
+        final yahooSym = toYahooSymbol(symbol, widget.market);
+        final quote = await yahoo.getQuote(yahooSym);
+        resolvedName = quote?.shortName;
+
+        if (quote == null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('找不到代號「$symbol」，請確認是否正確'),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
 
       if (!mounted) return;
 
-      if (quote?.shortName != null) {
-        _nameController.text = quote!.shortName!;
-      }
-
-      if (quote == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('找不到代號「$symbol」，請確認是否正確'),
-            duration: const Duration(seconds: 3),
-          ),
-        );
+      if (resolvedName != null) {
+        _nameController.text = resolvedName;
       }
     } catch (_) {
       // Silently ignore lookup failures
@@ -126,7 +156,7 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
       createdAt: now,
       updatedAt: now,
       symbol: symbol,
-      market: StockMarket.us,
+      market: widget.market,
       shares: double.parse(_sharesController.text.trim()),
       avgCost: double.parse(_avgCostController.text.trim()),
     );
@@ -152,10 +182,13 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final symbolHint = _isTw ? '例：2330' : '例：AAPL';
+    final nameHint = _isTw ? '例：台積電' : '例：Apple Inc.';
+    final costLabel = _isTw ? '平均成本 (TWD)' : '平均成本 (USD)';
+    final costHint = _isTw ? '例：850' : '例：150.00';
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? '編輯美股' : '新增美股'),
-      ),
+      appBar: AppBar(title: Text(_appBarTitle)),
       body: _isLoadingData
           ? const Center(child: CircularProgressIndicator())
           : Form(
@@ -166,11 +199,14 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
                   TextFormField(
                     controller: _symbolController,
                     focusNode: _symbolFocus,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '股票代號',
-                      hintText: '例：AAPL',
+                      hintText: symbolHint,
                     ),
-                    textCapitalization: TextCapitalization.characters,
+                    textCapitalization: _isTw
+                        ? TextCapitalization.none
+                        : TextCapitalization.characters,
+                    keyboardType: _isTw ? TextInputType.number : null,
                     textInputAction: TextInputAction.next,
                     validator: (v) =>
                         (v == null || v.trim().isEmpty) ? '請輸入股票代號' : null,
@@ -180,7 +216,7 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: '名稱（選填，離開代號欄自動帶入）',
-                      hintText: '例：Apple Inc.',
+                      hintText: nameHint,
                       suffixIcon: _isLookingUp
                           ? const Padding(
                               padding: EdgeInsets.all(12),
@@ -198,9 +234,9 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _sharesController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '持有股數',
-                      hintText: '支援碎股，例：10.5',
+                      hintText: _isTw ? '例：1000' : '支援碎股，例：10.5',
                     ),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
@@ -219,9 +255,9 @@ class _StockFormPageState extends ConsumerState<StockFormPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _avgCostController,
-                    decoration: const InputDecoration(
-                      labelText: '平均成本 (USD)',
-                      hintText: '例：150.00',
+                    decoration: InputDecoration(
+                      labelText: costLabel,
+                      hintText: costHint,
                     ),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),

@@ -23,7 +23,7 @@ final totalValueProvider = AutoDisposeFutureProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TotalValueRef = AutoDisposeFutureProviderRef<double>;
-String _$assetAllocationHash() => r'bbe629f0a81ca745e7051f5a7fdbe3820a659911';
+String _$assetAllocationHash() => r'8eaeda411eeb5be2ffbe218a78b2b2a2a2d5c723';
 
 /// See also [assetAllocation].
 @ProviderFor(assetAllocation)
@@ -58,23 +58,39 @@ final cashTotalValueProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CashTotalValueRef = AutoDisposeProviderRef<double>;
-String _$stockTotalValueTWDHash() =>
-    r'30f2acf9645777ea8a7cb77c90df379180d70514';
+String _$usStockTotalTWDHash() => r'1ae4007b6ca89df8a3c4219157061bc58e5666cf';
 
-/// See also [stockTotalValueTWD].
-@ProviderFor(stockTotalValueTWD)
-final stockTotalValueTWDProvider = AutoDisposeFutureProvider<double>.internal(
-  stockTotalValueTWD,
-  name: r'stockTotalValueTWDProvider',
+/// See also [usStockTotalTWD].
+@ProviderFor(usStockTotalTWD)
+final usStockTotalTWDProvider = AutoDisposeFutureProvider<double>.internal(
+  usStockTotalTWD,
+  name: r'usStockTotalTWDProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$stockTotalValueTWDHash,
+      : _$usStockTotalTWDHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef StockTotalValueTWDRef = AutoDisposeFutureProviderRef<double>;
+typedef UsStockTotalTWDRef = AutoDisposeFutureProviderRef<double>;
+String _$twStockTotalHash() => r'1c086465f79243bb5ab1740026bcf7d97ac1d8dd';
+
+/// See also [twStockTotal].
+@ProviderFor(twStockTotal)
+final twStockTotalProvider = AutoDisposeProvider<double>.internal(
+  twStockTotal,
+  name: r'twStockTotalProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$twStockTotalHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TwStockTotalRef = AutoDisposeProviderRef<double>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -14,7 +14,8 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cashTotal = ref.watch(cashTotalValueProvider);
-    final stockTotalAsync = ref.watch(stockTotalValueTWDProvider);
+    final usStockAsync = ref.watch(usStockTotalTWDProvider);
+    final twStockTotal = ref.watch(twStockTotalProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -51,23 +52,23 @@ class DashboardPage extends ConsumerWidget {
                     value: cashTotal,
                     color: const Color(0xFF2E7D32),
                   ),
-                  stockTotalAsync.when(
-                    loading: () => _AssetRow(
+                  usStockAsync.when(
+                    loading: () => const _AssetRow(
                       icon: Icons.show_chart,
                       label: '美股',
                       value: 0,
-                      color: const Color(0xFF1565C0),
-                      trailing: const SizedBox(
+                      color: Color(0xFF1565C0),
+                      trailing: SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     ),
-                    error: (_, _) => _AssetRow(
+                    error: (_, _) => const _AssetRow(
                       icon: Icons.show_chart,
                       label: '美股',
                       value: 0,
-                      color: const Color(0xFF1565C0),
+                      color: Color(0xFF1565C0),
                     ),
                     data: (v) => _AssetRow(
                       icon: Icons.show_chart,
@@ -75,6 +76,12 @@ class DashboardPage extends ConsumerWidget {
                       value: v,
                       color: const Color(0xFF1565C0),
                     ),
+                  ),
+                  _AssetRow(
+                    icon: Icons.flag,
+                    label: '台股',
+                    value: twStockTotal,
+                    color: const Color(0xFFEF6C00),
                   ),
                 ],
               ),

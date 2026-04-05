@@ -9,7 +9,7 @@
 | 1 | 基礎建設 | 1-2 天 | ✅ 完成 |
 | 2 | 台幣現金 CRUD | 1-2 天 | ✅ 完成 |
 | 3 | 美股 + 價格 API | 2-3 天 | ✅ 完成 |
-| 4 | 台股 | 1-2 天 | ⬜ 未開始 |
+| 4 | 台股 | 1-2 天 | ✅ 完成 |
 | 5 | 外幣 + 基金 + 加密貨幣 | 2-3 天 | ⬜ 未開始 |
 | 6 | 分析功能 | 2-3 天 | ⬜ 未開始 |
 | 7 | 進階功能（選做） | 未定 | ⬜ 未開始 |
@@ -124,18 +124,52 @@
 
 ---
 
-## Phase 4: 台股 ⬜
+## Phase 4: 台股 ✅
 
-**目標：** 台股 CRUD + TWSE API
+**目標：** 台股 CRUD + Yahoo Finance `.TW` 查詢
 
 **對應需求：** 需求 3b（台股部分）
 
-| 項目 | 狀態 |
-|------|------|
-| 台股 CRUD（複用 StockAsset, market=TW） | ⬜ |
-| Yahoo Finance `.TW` 查詢（共用美股 API code） | ⬜ |
-| TWSE OpenAPI fallback | ⬜ |
-| 首頁總資產 = 現金 + 美股(TWD) + 台股 | ⬜ |
+| 項目 | 狀態 | 產出檔案 |
+|------|------|---------|
+| TWSE MIS API 服務（即時報價+中文名稱，tse_/otc_ 自動偵測） | ✅ | `lib/features/price/data/twse_mis_service.dart` |
+| TWSE OpenAPI 服務（上市公司中文簡稱 fallback） | ✅ | `lib/features/price/data/twse_service.dart` |
+| TWSE MIS + TWSE + Yahoo 三層 provider | ✅ | `lib/features/price/providers/price_provider.dart` |
+| `toYahooSymbol()` 工具（TW 加 `.TW` 後綴） | ✅ | `lib/features/stock/presentation/providers/stock_provider.dart` |
+| `twStockAssetsProvider` 串流 | ✅ | 同上 |
+| `refreshStockPrices` 支援雙市場（US + TW） | ✅ | 同上 |
+| StockListPage 參數化（market, 幣別, 路由前綴） | ✅ | `lib/features/stock/presentation/stock_list_page.dart` |
+| StockFormPage 參數化（market, TWD/USD, 代號格式） | ✅ | `lib/features/stock/presentation/stock_form_page.dart` |
+| Assets Tab 3 tabs（現金/美股/台股） | ✅ | `lib/features/dashboard/presentation/assets_tab_page.dart` |
+| Dashboard 資產明細 3 列（現金/美股/台股） | ✅ | `lib/features/dashboard/presentation/dashboard_page.dart` |
+| Dashboard allocation 圓餅圖分 3 類 | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
+| `usStockTotalTWD` + `twStockTotal` providers | ✅ | 同上 |
+| 路由：`/assets/tw-stock/add` + `/assets/tw-stock/edit/:id` | ✅ | `lib/app/router.dart` |
+| flutter analyze 0 issues | ✅ | — |
+
+**功能流程：**
+1. 資產 Tab 三個子頁：現金 / 美股 / 台股
+2. 台股列表顯示名稱（如「台積電」）為標題，副標題為代號 + 股數 + 均價（NT$）
+3. 新增台股：代號欄為數字鍵盤（如 2330），離開欄位從 TWSE MIS API 帶入中文名稱（涵蓋上市、上櫃、ETF），fallback TWSE 公司清單 → Yahoo Finance
+4. 刷新按鈕：台股用 MIS API（~5 秒延遲），美股用 Yahoo Finance，各自 fallback
+5. Dashboard 總資產 = 現金 + 美股(×匯率) + 台股，圓餅圖分 3 類顯示
+6. TWSE OpenAPI fallback 留待後續需要時再加
+
+**技術決策：**
+- 複用 `StockAsset` + `StockRepository`，透過 `market` 欄位區分美股/台股
+- `toYahooSymbol(symbol, market)` 統一處理 Yahoo API 代號格式
+- `refreshStockPrices` 改為全市場掃描，`yahooToDb` Map 處理代號映射
+- StockListPage / StockFormPage 參數化而非複製，避免重複程式碼
+- 台股不需匯率換算，`twStockTotal` 為同步 provider
+- 台股代號欄使用數字鍵盤（`TextInputType.number`），美股維持字母大寫
+- **TWSE MIS API**（`mis.twse.com.tw/stock/api/getStockInfo.jsp`）：即時報價 + 中文名稱
+  - 自動偵測 `tse_`（上市+ETF）和 `otc_`（上櫃），先試 tse 再試 otc
+  - 批次查詢支援（`|` 分隔），一次請求更新所有台股
+  - `z` 欄位取成交價，無交易時 fallback `y`（昨收）
+- 台股名稱查詢優先順序：MIS API → TWSE 公司清單 → Yahoo Finance → 代號本身
+- 台股價格刷新優先順序：MIS API → Yahoo Finance（`.TW`）
+- MIS API 流量評估：個人用 ~20 支股票/15 分鐘 = 每小時 ~4 次批次請求，遠低於可負荷量
+- TWSE 公司清單 24 小時記憶體快取，keepAlive provider 確保不被釋放
 
 ---
 
