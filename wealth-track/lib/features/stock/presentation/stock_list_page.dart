@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/models/asset.dart';
 import '../../../core/utils/currency.dart';
 import '../../../core/utils/staleness.dart';
+import '../../../core/widgets/category_summary_header.dart';
 import 'providers/stock_provider.dart';
 import 'refresh_helper.dart';
 
@@ -22,6 +23,7 @@ class StockListPage extends ConsumerWidget {
   String get _title => _isTw ? '台股持倉' : '美股持倉';
   String get _emptyLabel => _isTw ? '還沒有任何台股持倉' : '還沒有任何美股持倉';
   String get _routePrefix => _isTw ? '/assets/tw-stock' : '/assets/stock';
+  String get _currencyPrefix => _isTw ? 'NT\$' : '\$';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,17 +89,31 @@ class StockListPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildList(
-    BuildContext context,
-    List<StockAsset> list,
-  ) {
+  Widget _buildList(BuildContext context, List<StockAsset> list) {
+    final cp = _currencyPrefix;
+    final total = list.fold<double>(0.0, (sum, s) => sum + s.marketValue);
+    final distribution = <String, double>{};
+    for (final s in list) {
+      distribution[s.name] = (distribution[s.name] ?? 0) + s.marketValue;
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 88),
-      itemCount: list.length,
-      itemBuilder: (context, i) => _StockTile(
-        asset: list[i],
-        routePrefix: _routePrefix,
-      ),
+      itemCount: list.length + 1,
+      itemBuilder: (context, i) {
+        if (i == 0) {
+          return CategorySummaryHeader(
+            formattedTotal: '$cp${formatAmount(total)}',
+            distribution: distribution,
+            formatValue: (v) => '$cp${formatAmount(v)}',
+          );
+        }
+        return _StockTile(
+          asset: list[i - 1],
+          routePrefix: _routePrefix,
+          currencyPrefix: cp,
+        );
+      },
     );
   }
 }
@@ -105,8 +121,13 @@ class StockListPage extends ConsumerWidget {
 class _StockTile extends ConsumerWidget {
   final StockAsset asset;
   final String routePrefix;
+  final String currencyPrefix;
 
-  const _StockTile({required this.asset, required this.routePrefix});
+  const _StockTile({
+    required this.asset,
+    required this.routePrefix,
+    required this.currencyPrefix,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -115,8 +136,16 @@ class _StockTile extends ConsumerWidget {
     final staleLabel = stalenessLabel(staleness);
     final returnPct = formatPercent(asset.returnRate);
     final isPositive = asset.returnRate >= 0;
-    final isTw = asset.market == StockMarket.tw;
-    final currencyPrefix = isTw ? 'NT\$' : '\$';
+    final cp = currencyPrefix;
+
+    final subtitleParts = [
+      asset.symbol,
+      '${asset.shares}股',
+      '均價 $cp${formatAmount(asset.avgCost)}',
+    ];
+    if (asset.currentPrice != null) {
+      subtitleParts.add('現 $cp${formatAmount(asset.currentPrice!)}');
+    }
 
     return Dismissible(
       key: ValueKey(asset.id),
@@ -184,15 +213,13 @@ class _StockTile extends ConsumerWidget {
             ],
           ],
         ),
-        subtitle: Text(
-          '${asset.symbol} · ${asset.shares} 股 · 均價 $currencyPrefix${formatAmount(asset.avgCost)}',
-        ),
+        subtitle: Text(subtitleParts.join(' · ')),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '$currencyPrefix${formatAmount(asset.currentPrice ?? asset.avgCost)}',
+              '$cp${formatAmount(asset.marketValue)}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),

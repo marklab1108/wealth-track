@@ -182,18 +182,19 @@
 | 項目 | 狀態 | 產出檔案 |
 |------|------|---------|
 | ExchangeRate 多幣別支援（一次 API 呼叫取全部匯率） | ✅ | `lib/features/price/data/exchange_rate_service.dart` |
-| `allRatesToTwd` provider（USD 交叉匯率） | ✅ | `lib/features/price/providers/price_provider.dart` |
+| `allRatesToTwd` provider（keepAlive + USD 交叉匯率） | ✅ | `lib/features/price/providers/price_provider.dart` |
+| 可複用 CategorySummaryHeader widget（總市值+圓餅圖） | ✅ | `lib/core/widgets/category_summary_header.dart` |
 | CoinGecko API 服務（search + getPrices） | ✅ | `lib/features/price/data/coingecko_service.dart` |
 | CoinGecko provider（keepAlive） | ✅ | `lib/features/price/providers/price_provider.dart` |
 | Yahoo 基金淨值爬蟲服務（meta JSON 解析） | ✅ | `lib/features/price/data/yahoo_fund_service.dart` |
 | Yahoo 基金 provider（keepAlive） | ✅ | `lib/features/price/providers/price_provider.dart` |
 | 基金 Repository（CRUD + updateNavByFundCode） | ✅ | `lib/features/fund/data/fund_repository.dart` |
 | 基金 Providers（watchAll, fundTotal, refreshFundPrices） | ✅ | `lib/features/fund/presentation/providers/fund_provider.dart` |
-| 基金列表頁（名稱/代號/單位/淨值/報酬率） | ✅ | `lib/features/fund/presentation/fund_list_page.dart` |
+| 基金列表頁（summary header + 總市值 trailing） | ✅ | `lib/features/fund/presentation/fund_list_page.dart` |
 | 基金新增/編輯表單（代號失焦自動帶入名稱，錯誤提示） | ✅ | `lib/features/fund/presentation/fund_form_page.dart` |
 | 加密貨幣 Repository（CRUD + updatePrice） | ✅ | `lib/features/crypto/data/crypto_repository.dart` |
 | 加密貨幣 Providers（watchAll, refreshCryptoPrices） | ✅ | `lib/features/crypto/presentation/providers/crypto_provider.dart` |
-| 加密貨幣列表頁（名稱/代號/數量/價格/報酬率） | ✅ | `lib/features/crypto/presentation/crypto_list_page.dart` |
+| 加密貨幣列表頁（summary header + 總市值 trailing） | ✅ | `lib/features/crypto/presentation/crypto_list_page.dart` |
 | 加密貨幣新增/編輯表單（代號自動帶入名稱） | ✅ | `lib/features/crypto/presentation/crypto_form_page.dart` |
 | Asset model 補 returnRate getter（Fund + Crypto） | ✅ | `lib/core/models/asset.dart` |
 | Dashboard 總值含全部五類資產 | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
@@ -202,23 +203,30 @@
 | 資產 Tab 增至 5 tabs（含基金/加密貨幣） | ✅ | `lib/features/dashboard/presentation/assets_tab_page.dart` |
 | 路由：fund/add, fund/edit, crypto/add, crypto/edit | ✅ | `lib/app/router.dart` |
 | 刷新邏輯整合：股票+加密貨幣+基金同時刷新 | ✅ | `lib/features/stock/presentation/refresh_helper.dart` |
-| 外幣現金匯率轉換（Dashboard 正確計算） | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
+| 外幣現金匯率轉換（Dashboard + 資產頁正確計算） | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
 | flutter analyze 0 issues | ✅ | — |
 
 **功能流程：**
 1. 資產 Tab 五個子頁：現金 / 美股 / 台股 / 基金 / 加密貨幣（可滑動 TabBar）
-2. 基金列表顯示名稱為標題，副標題為基金代號 + 持有單位數 + 均價，右側顯示淨值 + 報酬率
-3. 新增基金：輸入 Yahoo 基金代號（如 `F000014SAX:FO`）後離開欄位自動從 Yahoo 台灣帶入名稱；代號查不到會顯示錯誤提示
-4. 加密貨幣列表顯示名稱為標題，副標題為代號 + 數量 + 均價（USD），右側顯示價格 + 報酬率
-5. 新增加密貨幣：輸入代號（BTC）後離開欄位自動從 CoinGecko 帶入名稱（Bitcoin）
-6. 刷新按鈕：同時更新股票（MIS + Yahoo）、加密貨幣（CoinGecko）和基金淨值（Yahoo 台灣爬蟲），合併回報結果
-7. Dashboard 總資產 = 現金(含外幣匯率轉換) + 美股(×USD匯率) + 台股 + 基金 + 加密貨幣(×USD匯率)
-8. 圓餅圖分 5 類顯示：現金 / 美股 / 台股 / 基金 / 加密貨幣
+2. 每個資產列表頂部顯示 summary header（總市值 + 圓餅圖分布），2 筆以上自動顯示圓餅圖，超過 6 筆歸類為「其他」
+3. 股票/基金/加密貨幣每筆明細 trailing 顯示總市值（而非單價）+ 報酬率，subtitle 附上現價/淨值
+4. 現金頁 summary header 依幣別分布（TWD 換算），銀行小計也為 TWD 換算
+5. 基金列表顯示名稱為標題，副標題為代號 + 單位數 + 均價 + 現淨值，右側顯示總市值 + 報酬率
+6. 新增基金：輸入 Yahoo 基金代號（如 `F000014SAX:FO`）後離開欄位自動從 Yahoo 台灣帶入名稱；代號查不到會顯示錯誤提示
+7. 加密貨幣列表顯示名稱為標題，副標題為代號 + 數量 + 均價 + 現價（USD），右側顯示總市值 + 報酬率
+8. 新增加密貨幣：輸入代號（BTC）後離開欄位自動從 CoinGecko 帶入名稱（Bitcoin）
+9. 刷新按鈕：同時更新股票（MIS + Yahoo）、加密貨幣（CoinGecko）和基金淨值（Yahoo 台灣爬蟲），合併回報結果
+10. Dashboard 總資產 = 現金(含外幣匯率轉換) + 美股(×USD匯率) + 台股 + 基金 + 加密貨幣(×USD匯率)
+11. 圓餅圖分 5 類顯示：現金 / 美股 / 台股 / 基金 / 加密貨幣
 
 **技術決策：**
 - **ExchangeRate 多幣別支援**：單次 API 呼叫 `open.er-api.com/v6/latest/USD` 取得所有匯率，透過 USD 交叉匯率計算 X→TWD = USD→TWD / USD→X，一次呼叫覆蓋 12 種幣別
-- `allRatesToTwd` provider 取代原本的 `usdToTwd` 為底層實作，`usdToTwd` 改為從 `allRatesToTwd` 讀取
-- 現金 Dashboard 正確處理外幣：`cashTotalTWD` provider 使用 `CashAsset.valueTWD(rates)` 換算
+- `allRatesToTwd` provider 為 `keepAlive: true`，確保完整交叉匯率 map（含 JPY_TWD, EUR_TWD 等）在整個 session 內持續存在，避免 provider 重新評估時僅回傳 USD_TWD fallback（歷史 bug 修復）
+- DB 僅快取 USD→TWD 用於離線 fallback，寫入頻率限制為 24 小時一次
+- `usdToTwd` 改為從 `allRatesToTwd` 讀取
+- 現金頁匯率轉換：summary header 圓餅圖依幣別分布（TWD 換算），銀行小計使用 `valueTWD(rates)` 換算
+- **CategorySummaryHeader** 可複用 widget：各資產列表頂部顯示總市值 + 圓餅圖分布，2 筆以上才顯示圓餅圖，超過 6 筆自動歸類為「其他」
+- 列表明細 trailing 改為顯示總市值（而非單價），subtitle 附上現價/淨值（設計決策：部位總值比單價更重要）
 - **CoinGecko API**（`api.coingecko.com/api/v3`）：免費 30 req/min
   - `/search?query={symbol}`：查代號帶入名稱 + 取得 CoinGecko ID
   - `/simple/price?ids={ids}&vs_currencies=usd`：批次價格查詢
@@ -280,7 +288,8 @@ wealth-track/              (repo root)
 │   │   │   ├── database/  (app_database.dart, tables/asset_tables.dart)
 │   │   │   ├── models/    (asset.dart — sealed class hierarchy)
 │   │   │   ├── providers/ (database_provider.dart)
-│   │   │   └── utils/     (currency.dart, staleness.dart)
+│   │   │   ├── utils/     (currency.dart, staleness.dart)
+│   │   │   └── widgets/   (category_summary_header.dart)
 │   │   ├── features/
 │   │   │   ├── dashboard/presentation/ (dashboard_page, assets_tab_page, widgets/, providers/)
 │   │   │   ├── cash/      (data/cash_repository, presentation/cash_list_page, cash_form_page, providers/)

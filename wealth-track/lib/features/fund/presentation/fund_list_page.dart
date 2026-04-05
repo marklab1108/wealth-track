@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/models/asset.dart';
 import '../../../core/utils/currency.dart';
 import '../../../core/utils/staleness.dart';
+import '../../../core/widgets/category_summary_header.dart';
 import 'providers/fund_provider.dart';
 
 class FundListPage extends ConsumerWidget {
@@ -64,10 +65,25 @@ class FundListPage extends ConsumerWidget {
   }
 
   Widget _buildList(BuildContext context, List<FundAsset> list) {
+    final total = list.fold<double>(0.0, (sum, f) => sum + f.marketValue);
+    final distribution = <String, double>{};
+    for (final f in list) {
+      distribution[f.name] = (distribution[f.name] ?? 0) + f.marketValue;
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 88),
-      itemCount: list.length,
-      itemBuilder: (context, i) => _FundTile(asset: list[i]),
+      itemCount: list.length + 1,
+      itemBuilder: (context, i) {
+        if (i == 0) {
+          return CategorySummaryHeader(
+            formattedTotal: 'NT\$${formatAmount(total)}',
+            distribution: distribution,
+            formatValue: (v) => 'NT\$${formatAmount(v)}',
+          );
+        }
+        return _FundTile(asset: list[i - 1]);
+      },
     );
   }
 }
@@ -84,6 +100,15 @@ class _FundTile extends ConsumerWidget {
     final staleLabel = stalenessLabel(staleness);
     final returnPct = formatPercent(asset.returnRate);
     final isPositive = asset.returnRate >= 0;
+
+    final subtitleParts = [
+      asset.fundCode,
+      '${formatAmount(asset.units)}單位',
+      '均價 NT\$${formatAmount(asset.avgCost)}',
+    ];
+    if (asset.currentNav != null) {
+      subtitleParts.add('淨值 NT\$${formatAmount(asset.currentNav!)}');
+    }
 
     return Dismissible(
       key: ValueKey(asset.id),
@@ -143,15 +168,13 @@ class _FundTile extends ConsumerWidget {
             ],
           ],
         ),
-        subtitle: Text(
-          '${asset.fundCode} · ${formatAmount(asset.units)} 單位 · 均價 NT\$${formatAmount(asset.avgCost)}',
-        ),
+        subtitle: Text(subtitleParts.join(' · ')),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              'NT\$${formatAmount(asset.currentNav ?? asset.avgCost)}',
+              'NT\$${formatAmount(asset.marketValue)}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),

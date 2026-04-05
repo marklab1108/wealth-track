@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/models/asset.dart';
 import '../../../core/utils/currency.dart';
+import '../../../core/widgets/category_summary_header.dart';
+import '../../price/providers/price_provider.dart';
 import 'providers/cash_provider.dart';
 
 class CashListPage extends ConsumerWidget {
@@ -23,7 +25,9 @@ class CashListPage extends ConsumerWidget {
         error: (e, _) => Center(child: Text('載入失敗: $e')),
         data: (list) {
           if (list.isEmpty) return _buildEmpty(theme);
-          return _buildList(context, ref, list, theme);
+          final rates =
+              ref.watch(allRatesToTwdProvider).valueOrNull ?? {};
+          return _buildList(context, ref, list, theme, rates);
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -67,19 +71,35 @@ class CashListPage extends ConsumerWidget {
     WidgetRef ref,
     List<CashAsset> list,
     ThemeData theme,
+    Map<String, double> rates,
   ) {
+    final totalTwd =
+        list.fold<double>(0.0, (sum, a) => sum + a.valueTWD(rates));
+
+    final currencyDist = <String, double>{};
+    for (final a in list) {
+      final key = a.currency.label;
+      currencyDist[key] = (currencyDist[key] ?? 0) + a.valueTWD(rates);
+    }
+
     final grouped = <String, List<CashAsset>>{};
     for (final a in list) {
       grouped.putIfAbsent(a.bankName, () => []).add(a);
     }
-
     final banks = grouped.keys.toList()..sort();
 
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 88),
-      itemCount: banks.length,
+      itemCount: banks.length + 1,
       itemBuilder: (context, i) {
-        final bank = banks[i];
+        if (i == 0) {
+          return CategorySummaryHeader(
+            formattedTotal: formatTWD(totalTwd),
+            distribution: currencyDist,
+            formatValue: (v) => formatTWD(v),
+          );
+        }
+        final bank = banks[i - 1];
         final items = grouped[bank]!;
         final bankTotal = items.fold(0.0, (sum, a) => sum + a.amount);
 

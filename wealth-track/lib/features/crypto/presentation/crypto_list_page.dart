@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/models/asset.dart';
 import '../../../core/utils/currency.dart';
 import '../../../core/utils/staleness.dart';
+import '../../../core/widgets/category_summary_header.dart';
 import 'providers/crypto_provider.dart';
 
 class CryptoListPage extends ConsumerWidget {
@@ -64,10 +65,25 @@ class CryptoListPage extends ConsumerWidget {
   }
 
   Widget _buildList(BuildContext context, List<CryptoAsset> list) {
+    final total = list.fold<double>(0.0, (sum, c) => sum + c.marketValue);
+    final distribution = <String, double>{};
+    for (final c in list) {
+      distribution[c.name] = (distribution[c.name] ?? 0) + c.marketValue;
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 88),
-      itemCount: list.length,
-      itemBuilder: (context, i) => _CryptoTile(asset: list[i]),
+      itemCount: list.length + 1,
+      itemBuilder: (context, i) {
+        if (i == 0) {
+          return CategorySummaryHeader(
+            formattedTotal: '\$${formatAmount(total)}',
+            distribution: distribution,
+            formatValue: (v) => '\$${formatAmount(v)}',
+          );
+        }
+        return _CryptoTile(asset: list[i - 1]);
+      },
     );
   }
 }
@@ -84,6 +100,15 @@ class _CryptoTile extends ConsumerWidget {
     final staleLabel = stalenessLabel(staleness);
     final returnPct = formatPercent(asset.returnRate);
     final isPositive = asset.returnRate >= 0;
+
+    final subtitleParts = [
+      asset.symbol,
+      formatAmount(asset.amount),
+      '均價 \$${formatAmount(asset.avgCost)}',
+    ];
+    if (asset.currentPrice != null) {
+      subtitleParts.add('現 \$${formatAmount(asset.currentPrice!)}');
+    }
 
     return Dismissible(
       key: ValueKey(asset.id),
@@ -148,15 +173,13 @@ class _CryptoTile extends ConsumerWidget {
             ],
           ],
         ),
-        subtitle: Text(
-          '${asset.symbol} · ${formatAmount(asset.amount)} · 均價 \$${formatAmount(asset.avgCost)}',
-        ),
+        subtitle: Text(subtitleParts.join(' · ')),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '\$${formatAmount(asset.currentPrice ?? asset.avgCost)}',
+              '\$${formatAmount(asset.marketValue)}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
