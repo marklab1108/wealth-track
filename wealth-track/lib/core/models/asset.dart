@@ -130,6 +130,12 @@ class FundAsset extends Asset {
 
   double get marketValue => units * (currentNav ?? avgCost);
 
+  double get returnRate {
+    if (avgCost == 0) return 0;
+    final nav = currentNav ?? avgCost;
+    return (nav - avgCost) / avgCost;
+  }
+
   @override
   double valueTWD(Map<String, double> exchangeRates) => marketValue;
 }
@@ -157,6 +163,12 @@ class CryptoAsset extends Asset {
   AssetType get type => AssetType.crypto;
 
   double get marketValue => amount * (currentPrice ?? avgCost);
+
+  double get returnRate {
+    if (avgCost == 0) return 0;
+    final price = currentPrice ?? avgCost;
+    return (price - avgCost) / avgCost;
+  }
 
   @override
   double valueTWD(Map<String, double> exchangeRates) {

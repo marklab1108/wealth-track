@@ -2,8 +2,10 @@ import 'package:go_router/go_router.dart';
 
 import '../core/models/asset.dart';
 import '../features/cash/presentation/cash_form_page.dart';
+import '../features/crypto/presentation/crypto_form_page.dart';
 import '../features/dashboard/presentation/assets_tab_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
+import '../features/fund/presentation/fund_form_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/stock/presentation/stock_form_page.dart';
 import 'shell_page.dart';
@@ -60,6 +62,26 @@ final router = GoRouter(
                   builder: (context, state) => StockFormPage(
                     editId: state.pathParameters['id'],
                     market: StockMarket.tw,
+                  ),
+                ),
+                GoRoute(
+                  path: 'fund/add',
+                  builder: (context, state) => const FundFormPage(),
+                ),
+                GoRoute(
+                  path: 'fund/edit/:id',
+                  builder: (context, state) => FundFormPage(
+                    editId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'crypto/add',
+                  builder: (context, state) => const CryptoFormPage(),
+                ),
+                GoRoute(
+                  path: 'crypto/edit/:id',
+                  builder: (context, state) => CryptoFormPage(
+                    editId: state.pathParameters['id'],
                   ),
                 ),
               ],

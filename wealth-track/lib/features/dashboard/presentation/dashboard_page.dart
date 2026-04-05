@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/currency.dart';
+import '../../fund/presentation/providers/fund_provider.dart';
 import '../../stock/presentation/refresh_helper.dart';
 import 'providers/dashboard_provider.dart';
 import 'widgets/allocation_pie_chart.dart';
@@ -13,9 +14,11 @@ class DashboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final cashTotal = ref.watch(cashTotalValueProvider);
+    final cashAsync = ref.watch(cashTotalTWDProvider);
     final usStockAsync = ref.watch(usStockTotalTWDProvider);
     final twStockTotal = ref.watch(twStockTotalProvider);
+    final fundTotal = ref.watch(fundTotalProvider);
+    final cryptoAsync = ref.watch(cryptoTotalTWDProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -46,42 +49,35 @@ class DashboardPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _AssetRow(
+                  _buildAsyncRow(
+                    cashAsync,
                     icon: Icons.account_balance,
                     label: '現金',
-                    value: cashTotal,
                     color: const Color(0xFF2E7D32),
                   ),
-                  usStockAsync.when(
-                    loading: () => const _AssetRow(
-                      icon: Icons.show_chart,
-                      label: '美股',
-                      value: 0,
-                      color: Color(0xFF1565C0),
-                      trailing: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    error: (_, _) => const _AssetRow(
-                      icon: Icons.show_chart,
-                      label: '美股',
-                      value: 0,
-                      color: Color(0xFF1565C0),
-                    ),
-                    data: (v) => _AssetRow(
-                      icon: Icons.show_chart,
-                      label: '美股',
-                      value: v,
-                      color: const Color(0xFF1565C0),
-                    ),
+                  _buildAsyncRow(
+                    usStockAsync,
+                    icon: Icons.show_chart,
+                    label: '美股',
+                    color: const Color(0xFF1565C0),
                   ),
                   _AssetRow(
                     icon: Icons.flag,
                     label: '台股',
                     value: twStockTotal,
                     color: const Color(0xFFEF6C00),
+                  ),
+                  _AssetRow(
+                    icon: Icons.pie_chart,
+                    label: '基金',
+                    value: fundTotal,
+                    color: const Color(0xFF6A1B9A),
+                  ),
+                  _buildAsyncRow(
+                    cryptoAsync,
+                    icon: Icons.currency_bitcoin,
+                    label: '加密貨幣',
+                    color: const Color(0xFFF57F17),
                   ),
                 ],
               ),
@@ -90,6 +86,39 @@ class DashboardPage extends ConsumerWidget {
           const SizedBox(height: 16),
           const AllocationPieChart(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAsyncRow(
+    AsyncValue<double> asyncValue, {
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return asyncValue.when(
+      loading: () => _AssetRow(
+        icon: icon,
+        label: label,
+        value: 0,
+        color: color,
+        trailing: const SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      error: (_, _) => _AssetRow(
+        icon: icon,
+        label: label,
+        value: 0,
+        color: color,
+      ),
+      data: (v) => _AssetRow(
+        icon: icon,
+        label: label,
+        value: v,
+        color: color,
       ),
     );
   }

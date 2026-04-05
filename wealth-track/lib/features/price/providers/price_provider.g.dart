@@ -76,6 +76,40 @@ final twseServiceProvider = Provider<TwseService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TwseServiceRef = ProviderRef<TwseService>;
+String _$coinGeckoServiceHash() => r'b99b9f2cb591e716e68f5085ccfdfd46f14ddd6d';
+
+/// See also [coinGeckoService].
+@ProviderFor(coinGeckoService)
+final coinGeckoServiceProvider = Provider<CoinGeckoService>.internal(
+  coinGeckoService,
+  name: r'coinGeckoServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$coinGeckoServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CoinGeckoServiceRef = ProviderRef<CoinGeckoService>;
+String _$yahooFundServiceHash() => r'9734689dcb81a322314320b7d9bb44839668ec02';
+
+/// See also [yahooFundService].
+@ProviderFor(yahooFundService)
+final yahooFundServiceProvider = Provider<YahooFundService>.internal(
+  yahooFundService,
+  name: r'yahooFundServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$yahooFundServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef YahooFundServiceRef = ProviderRef<YahooFundService>;
 String _$exchangeRateRepositoryHash() =>
     r'43310339fa01bb4351b877da8c0d7f29b3868be3';
 
@@ -95,9 +129,30 @@ final exchangeRateRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ExchangeRateRepositoryRef = ProviderRef<ExchangeRateRepository>;
-String _$usdToTwdHash() => r'a0abfb37cdbad220a0bbf13f2f31e579a8a13579';
+String _$allRatesToTwdHash() => r'eb1da6f6d059c35881a31fc10354fc26f9d44e35';
 
-/// Fetches USD→TWD rate. Uses DB cache (24h), falls back to API.
+/// Fetches all currency→TWD rates via a single API call (base=USD, cross-rates).
+/// Cached 24h in DB (USD→TWD) + computed cross-rates.
+///
+/// Copied from [allRatesToTwd].
+@ProviderFor(allRatesToTwd)
+final allRatesToTwdProvider =
+    AutoDisposeFutureProvider<Map<String, double>>.internal(
+      allRatesToTwd,
+      name: r'allRatesToTwdProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$allRatesToTwdHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllRatesToTwdRef = AutoDisposeFutureProviderRef<Map<String, double>>;
+String _$usdToTwdHash() => r'87a3fd158184c82b7ba6e4f76c86ed630383cd99';
+
+/// Convenience accessor: USD→TWD from the full rates map.
 ///
 /// Copied from [usdToTwd].
 @ProviderFor(usdToTwd)
