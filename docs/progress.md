@@ -185,10 +185,12 @@
 | `allRatesToTwd` provider（USD 交叉匯率） | ✅ | `lib/features/price/providers/price_provider.dart` |
 | CoinGecko API 服務（search + getPrices） | ✅ | `lib/features/price/data/coingecko_service.dart` |
 | CoinGecko provider（keepAlive） | ✅ | `lib/features/price/providers/price_provider.dart` |
-| 基金 Repository（CRUD） | ✅ | `lib/features/fund/data/fund_repository.dart` |
-| 基金 Providers（watchAll, fundTotal） | ✅ | `lib/features/fund/presentation/providers/fund_provider.dart` |
+| Yahoo 基金淨值爬蟲服務（meta JSON 解析） | ✅ | `lib/features/price/data/yahoo_fund_service.dart` |
+| Yahoo 基金 provider（keepAlive） | ✅ | `lib/features/price/providers/price_provider.dart` |
+| 基金 Repository（CRUD + updateNavByFundCode） | ✅ | `lib/features/fund/data/fund_repository.dart` |
+| 基金 Providers（watchAll, fundTotal, refreshFundPrices） | ✅ | `lib/features/fund/presentation/providers/fund_provider.dart` |
 | 基金列表頁（名稱/代號/單位/淨值/報酬率） | ✅ | `lib/features/fund/presentation/fund_list_page.dart` |
-| 基金新增/編輯表單（代號/名稱/單位/成本/淨值） | ✅ | `lib/features/fund/presentation/fund_form_page.dart` |
+| 基金新增/編輯表單（代號失焦自動帶入名稱，錯誤提示） | ✅ | `lib/features/fund/presentation/fund_form_page.dart` |
 | 加密貨幣 Repository（CRUD + updatePrice） | ✅ | `lib/features/crypto/data/crypto_repository.dart` |
 | 加密貨幣 Providers（watchAll, refreshCryptoPrices） | ✅ | `lib/features/crypto/presentation/providers/crypto_provider.dart` |
 | 加密貨幣列表頁（名稱/代號/數量/價格/報酬率） | ✅ | `lib/features/crypto/presentation/crypto_list_page.dart` |
@@ -199,17 +201,17 @@
 | Dashboard 圓餅圖分 5 類（現金/美股/台股/基金/加密貨幣） | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
 | 資產 Tab 增至 5 tabs（含基金/加密貨幣） | ✅ | `lib/features/dashboard/presentation/assets_tab_page.dart` |
 | 路由：fund/add, fund/edit, crypto/add, crypto/edit | ✅ | `lib/app/router.dart` |
-| 刷新邏輯整合：股票+加密貨幣同時刷新 | ✅ | `lib/features/stock/presentation/refresh_helper.dart` |
+| 刷新邏輯整合：股票+加密貨幣+基金同時刷新 | ✅ | `lib/features/stock/presentation/refresh_helper.dart` |
 | 外幣現金匯率轉換（Dashboard 正確計算） | ✅ | `lib/features/dashboard/presentation/providers/dashboard_provider.dart` |
 | flutter analyze 0 issues | ✅ | — |
 
 **功能流程：**
 1. 資產 Tab 五個子頁：現金 / 美股 / 台股 / 基金 / 加密貨幣（可滑動 TabBar）
 2. 基金列表顯示名稱為標題，副標題為基金代號 + 持有單位數 + 均價，右側顯示淨值 + 報酬率
-3. 新增基金：手動輸入代號、名稱、單位數、成本、最新淨值（選填）。v1 不支援淨值自動更新
+3. 新增基金：輸入 Yahoo 基金代號（如 `F000014SAX:FO`）後離開欄位自動從 Yahoo 台灣帶入名稱；代號查不到會顯示錯誤提示
 4. 加密貨幣列表顯示名稱為標題，副標題為代號 + 數量 + 均價（USD），右側顯示價格 + 報酬率
 5. 新增加密貨幣：輸入代號（BTC）後離開欄位自動從 CoinGecko 帶入名稱（Bitcoin）
-6. 刷新按鈕：同時更新股票（MIS + Yahoo）和加密貨幣（CoinGecko）價格，合併回報結果
+6. 刷新按鈕：同時更新股票（MIS + Yahoo）、加密貨幣（CoinGecko）和基金淨值（Yahoo 台灣爬蟲），合併回報結果
 7. Dashboard 總資產 = 現金(含外幣匯率轉換) + 美股(×USD匯率) + 台股 + 基金 + 加密貨幣(×USD匯率)
 8. 圓餅圖分 5 類顯示：現金 / 美股 / 台股 / 基金 / 加密貨幣
 
@@ -222,11 +224,17 @@
   - `/simple/price?ids={ids}&vs_currencies=usd`：批次價格查詢
   - In-memory `_idCache`：symbol→id 映射快取，避免重複搜尋
 - 加密貨幣價格快取 5 分鐘（設計文件規定）
-- 基金 v1 淨值手動輸入，無自動 API（設計文件記載，待未來擴展）
+- **Yahoo 基金淨值爬蟲**（`tw.stock.yahoo.com/fund/{code}/summary`）：
+  - 從 HTML 內嵌 `meta` JSON 解析基金名稱、淨值、日期
+  - 代號為 Yahoo/Morningstar fund ID（如 `F000014SAX:FO`），使用者從 Yahoo 股市 URL 取得
+  - `getQuotes()` 並行批次查詢多檔基金
+  - 基金淨值快取 4 小時（每日僅更新一次，無需頻繁刷新）
+- 基金表單代號欄 `FocusNode` 監聽失焦事件，觸發 Yahoo 自動查名稱；查無代號顯示 SnackBar 錯誤提示
+- 基金表單不顯示淨值欄位（與股票/加密貨幣一致），淨值由刷新按鈕自動從 Yahoo 取得
 - `FundAsset` 和 `CryptoAsset` 都加上 `returnRate` getter，公式同 `StockAsset`
-- `refreshAndNotify` 整合：同時 `Future.wait` 股票和加密貨幣刷新，合併 `RefreshResult`
+- `refreshAndNotify` 整合：同時 `Future.wait` 股票、加密貨幣和基金刷新，合併 `RefreshResult`
 - Assets Tab 使用 `isScrollable: true` + `TabAlignment.start` 以容納 5 tabs
-- 刷新按鈕只在有價格 API 的 tab 顯示（美股/台股/加密貨幣），基金和現金不顯示
+- 刷新按鈕在美股/台股/基金/加密貨幣 tab 顯示，現金不顯示
 
 ---
 
@@ -277,7 +285,7 @@ wealth-track/              (repo root)
 │   │   │   ├── dashboard/presentation/ (dashboard_page, assets_tab_page, widgets/, providers/)
 │   │   │   ├── cash/      (data/cash_repository, presentation/cash_list_page, cash_form_page, providers/)
 │   │   │   ├── stock/     (data/stock_repository, presentation/stock_list_page, stock_form_page, refresh_helper, providers/)
-│   │   │   ├── price/     (data/yahoo_finance_service, exchange_rate_service, exchange_rate_repository, coingecko_service, providers/)
+│   │   │   ├── price/     (data/yahoo_finance_service, yahoo_fund_service, exchange_rate_service, exchange_rate_repository, coingecko_service, providers/)
 │   │   │   ├── fund/      (data/fund_repository, presentation/fund_list_page, fund_form_page, providers/)
 │   │   │   ├── crypto/    (data/crypto_repository, presentation/crypto_list_page, crypto_form_page, providers/)
 │   │   │   └── settings/  (settings_page — 版本資訊)
