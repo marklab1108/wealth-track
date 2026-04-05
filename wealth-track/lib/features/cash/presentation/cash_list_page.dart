@@ -101,7 +101,8 @@ class CashListPage extends ConsumerWidget {
         }
         final bank = banks[i - 1];
         final items = grouped[bank]!;
-        final bankTotal = items.fold(0.0, (sum, a) => sum + a.amount);
+        final bankTotal =
+            items.fold<double>(0.0, (sum, a) => sum + a.valueTWD(rates));
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

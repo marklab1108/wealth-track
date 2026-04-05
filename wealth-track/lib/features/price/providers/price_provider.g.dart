@@ -129,27 +129,27 @@ final exchangeRateRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ExchangeRateRepositoryRef = ProviderRef<ExchangeRateRepository>;
-String _$allRatesToTwdHash() => r'eb1da6f6d059c35881a31fc10354fc26f9d44e35';
+String _$allRatesToTwdHash() => r'65b2e42762f110bcddaa609378ab33d856d1e217';
 
 /// Fetches all currency→TWD rates via a single API call (base=USD, cross-rates).
-/// Cached 24h in DB (USD→TWD) + computed cross-rates.
+/// keepAlive so the full cross-rate map persists for the session.
+/// DB caches USD→TWD for offline fallback; write throttled to 24h.
 ///
 /// Copied from [allRatesToTwd].
 @ProviderFor(allRatesToTwd)
-final allRatesToTwdProvider =
-    AutoDisposeFutureProvider<Map<String, double>>.internal(
-      allRatesToTwd,
-      name: r'allRatesToTwdProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$allRatesToTwdHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final allRatesToTwdProvider = FutureProvider<Map<String, double>>.internal(
+  allRatesToTwd,
+  name: r'allRatesToTwdProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$allRatesToTwdHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AllRatesToTwdRef = AutoDisposeFutureProviderRef<Map<String, double>>;
+typedef AllRatesToTwdRef = FutureProviderRef<Map<String, double>>;
 String _$usdToTwdHash() => r'87a3fd158184c82b7ba6e4f76c86ed630383cd99';
 
 /// Convenience accessor: USD→TWD from the full rates map.

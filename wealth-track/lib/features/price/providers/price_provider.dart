@@ -62,30 +62,31 @@ ExchangeRateRepository exchangeRateRepository(
 const _fxCacheHours = 24;
 
 /// Fetches all currency→TWD rates via a single API call (base=USD, cross-rates).
-/// Cached 24h in DB (USD→TWD) + computed cross-rates.
-@riverpod
+/// keepAlive so the full cross-rate map persists for the session.
+/// DB caches USD→TWD for offline fallback; write throttled to 24h.
+@Riverpod(keepAlive: true)
 Future<Map<String, double>> allRatesToTwd(AllRatesToTwdRef ref) async {
   final repo = ref.watch(exchangeRateRepositoryProvider);
   final svc = ref.watch(exchangeRateServiceProvider);
 
-  final fetchedAt = await repo.getLatestFetchedAt('USD', 'TWD');
-  final needsFresh = fetchedAt == null ||
-      DateTime.now().difference(fetchedAt).inHours >= _fxCacheHours;
+  final allRates = await svc.getAllRates('USD');
+  if (allRates != null && allRates.containsKey('TWD')) {
+    final twdPerUsd = allRates['TWD']!;
 
-  if (needsFresh) {
-    final allRates = await svc.getAllRates('USD');
-    if (allRates != null && allRates.containsKey('TWD')) {
-      final twdPerUsd = allRates['TWD']!;
+    final fetchedAt = await repo.getLatestFetchedAt('USD', 'TWD');
+    final needsWrite = fetchedAt == null ||
+        DateTime.now().difference(fetchedAt).inHours >= _fxCacheHours;
+    if (needsWrite) {
       await repo.insert('USD', 'TWD', twdPerUsd);
-
-      final result = <String, double>{'USD_TWD': twdPerUsd};
-      for (final entry in allRates.entries) {
-        if (entry.key != 'USD' && entry.key != 'TWD' && entry.value > 0) {
-          result['${entry.key}_TWD'] = twdPerUsd / entry.value;
-        }
-      }
-      return result;
     }
+
+    final result = <String, double>{'USD_TWD': twdPerUsd};
+    for (final entry in allRates.entries) {
+      if (entry.key != 'USD' && entry.key != 'TWD' && entry.value > 0) {
+        result['${entry.key}_TWD'] = twdPerUsd / entry.value;
+      }
+    }
+    return result;
   }
 
   final usdTwd = await repo.getLatestRate('USD', 'TWD') ?? 32.0;
