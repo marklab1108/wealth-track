@@ -4,7 +4,7 @@ part of 'app_database.dart';
 
 // ignore_for_file: type=lint
 class $CashAssetsTable extends CashAssets
-    with TableInfo<$CashAssetsTable, CashAsset> {
+    with TableInfo<$CashAssetsTable, CashAssetRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -100,7 +100,7 @@ class $CashAssetsTable extends CashAssets
   static const String $name = 'cash_assets';
   @override
   VerificationContext validateIntegrity(
-    Insertable<CashAsset> instance, {
+    Insertable<CashAssetRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -160,9 +160,9 @@ class $CashAssetsTable extends CashAssets
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  CashAsset map(Map<String, dynamic> data, {String? tablePrefix}) {
+  CashAssetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return CashAsset(
+    return CashAssetRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -200,7 +200,7 @@ class $CashAssetsTable extends CashAssets
   }
 }
 
-class CashAsset extends DataClass implements Insertable<CashAsset> {
+class CashAssetRow extends DataClass implements Insertable<CashAssetRow> {
   final String id;
   final String name;
   final DateTime createdAt;
@@ -208,7 +208,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
   final String currency;
   final String bankName;
   final double amount;
-  const CashAsset({
+  const CashAssetRow({
     required this.id,
     required this.name,
     required this.createdAt,
@@ -242,12 +242,12 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
     );
   }
 
-  factory CashAsset.fromJson(
+  factory CashAssetRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return CashAsset(
+    return CashAssetRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -271,7 +271,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
     };
   }
 
-  CashAsset copyWith({
+  CashAssetRow copyWith({
     String? id,
     String? name,
     DateTime? createdAt,
@@ -279,7 +279,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
     String? currency,
     String? bankName,
     double? amount,
-  }) => CashAsset(
+  }) => CashAssetRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
@@ -288,8 +288,8 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
     bankName: bankName ?? this.bankName,
     amount: amount ?? this.amount,
   );
-  CashAsset copyWithCompanion(CashAssetsCompanion data) {
-    return CashAsset(
+  CashAssetRow copyWithCompanion(CashAssetsCompanion data) {
+    return CashAssetRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -302,7 +302,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
 
   @override
   String toString() {
-    return (StringBuffer('CashAsset(')
+    return (StringBuffer('CashAssetRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -320,7 +320,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is CashAsset &&
+      (other is CashAssetRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
@@ -330,7 +330,7 @@ class CashAsset extends DataClass implements Insertable<CashAsset> {
           other.amount == this.amount);
 }
 
-class CashAssetsCompanion extends UpdateCompanion<CashAsset> {
+class CashAssetsCompanion extends UpdateCompanion<CashAssetRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
@@ -363,7 +363,7 @@ class CashAssetsCompanion extends UpdateCompanion<CashAsset> {
        currency = Value(currency),
        bankName = Value(bankName),
        amount = Value(amount);
-  static Insertable<CashAsset> custom({
+  static Insertable<CashAssetRow> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -454,7 +454,7 @@ class CashAssetsCompanion extends UpdateCompanion<CashAsset> {
 }
 
 class $StockAssetsTable extends StockAssets
-    with TableInfo<$StockAssetsTable, StockAsset> {
+    with TableInfo<$StockAssetsTable, StockAssetRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -583,7 +583,7 @@ class $StockAssetsTable extends StockAssets
   static const String $name = 'stock_assets';
   @override
   VerificationContext validateIntegrity(
-    Insertable<StockAsset> instance, {
+    Insertable<StockAssetRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -669,9 +669,9 @@ class $StockAssetsTable extends StockAssets
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  StockAsset map(Map<String, dynamic> data, {String? tablePrefix}) {
+  StockAssetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return StockAsset(
+    return StockAssetRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -721,7 +721,7 @@ class $StockAssetsTable extends StockAssets
   }
 }
 
-class StockAsset extends DataClass implements Insertable<StockAsset> {
+class StockAssetRow extends DataClass implements Insertable<StockAssetRow> {
   final String id;
   final String name;
   final DateTime createdAt;
@@ -732,7 +732,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
   final double avgCost;
   final double? currentPrice;
   final DateTime? priceUpdatedAt;
-  const StockAsset({
+  const StockAssetRow({
     required this.id,
     required this.name,
     required this.createdAt,
@@ -783,12 +783,12 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
     );
   }
 
-  factory StockAsset.fromJson(
+  factory StockAssetRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return StockAsset(
+    return StockAssetRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -818,7 +818,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
     };
   }
 
-  StockAsset copyWith({
+  StockAssetRow copyWith({
     String? id,
     String? name,
     DateTime? createdAt,
@@ -829,7 +829,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
     double? avgCost,
     Value<double?> currentPrice = const Value.absent(),
     Value<DateTime?> priceUpdatedAt = const Value.absent(),
-  }) => StockAsset(
+  }) => StockAssetRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
@@ -843,8 +843,8 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
         ? priceUpdatedAt.value
         : this.priceUpdatedAt,
   );
-  StockAsset copyWithCompanion(StockAssetsCompanion data) {
-    return StockAsset(
+  StockAssetRow copyWithCompanion(StockAssetsCompanion data) {
+    return StockAssetRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -864,7 +864,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
 
   @override
   String toString() {
-    return (StringBuffer('StockAsset(')
+    return (StringBuffer('StockAssetRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -895,7 +895,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is StockAsset &&
+      (other is StockAssetRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
@@ -908,7 +908,7 @@ class StockAsset extends DataClass implements Insertable<StockAsset> {
           other.priceUpdatedAt == this.priceUpdatedAt);
 }
 
-class StockAssetsCompanion extends UpdateCompanion<StockAsset> {
+class StockAssetsCompanion extends UpdateCompanion<StockAssetRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
@@ -951,7 +951,7 @@ class StockAssetsCompanion extends UpdateCompanion<StockAsset> {
        market = Value(market),
        shares = Value(shares),
        avgCost = Value(avgCost);
-  static Insertable<StockAsset> custom({
+  static Insertable<StockAssetRow> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -1066,7 +1066,7 @@ class StockAssetsCompanion extends UpdateCompanion<StockAsset> {
 }
 
 class $FundAssetsTable extends FundAssets
-    with TableInfo<$FundAssetsTable, FundAsset> {
+    with TableInfo<$FundAssetsTable, FundAssetRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1186,7 +1186,7 @@ class $FundAssetsTable extends FundAssets
   static const String $name = 'fund_assets';
   @override
   VerificationContext validateIntegrity(
-    Insertable<FundAsset> instance, {
+    Insertable<FundAssetRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1261,9 +1261,9 @@ class $FundAssetsTable extends FundAssets
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  FundAsset map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FundAssetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return FundAsset(
+    return FundAssetRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1309,7 +1309,7 @@ class $FundAssetsTable extends FundAssets
   }
 }
 
-class FundAsset extends DataClass implements Insertable<FundAsset> {
+class FundAssetRow extends DataClass implements Insertable<FundAssetRow> {
   final String id;
   final String name;
   final DateTime createdAt;
@@ -1319,7 +1319,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
   final double avgCost;
   final double? currentNav;
   final DateTime? navUpdatedAt;
-  const FundAsset({
+  const FundAssetRow({
     required this.id,
     required this.name,
     required this.createdAt,
@@ -1367,12 +1367,12 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
     );
   }
 
-  factory FundAsset.fromJson(
+  factory FundAssetRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FundAsset(
+    return FundAssetRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1400,7 +1400,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
     };
   }
 
-  FundAsset copyWith({
+  FundAssetRow copyWith({
     String? id,
     String? name,
     DateTime? createdAt,
@@ -1410,7 +1410,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
     double? avgCost,
     Value<double?> currentNav = const Value.absent(),
     Value<DateTime?> navUpdatedAt = const Value.absent(),
-  }) => FundAsset(
+  }) => FundAssetRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
@@ -1421,8 +1421,8 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
     currentNav: currentNav.present ? currentNav.value : this.currentNav,
     navUpdatedAt: navUpdatedAt.present ? navUpdatedAt.value : this.navUpdatedAt,
   );
-  FundAsset copyWithCompanion(FundAssetsCompanion data) {
-    return FundAsset(
+  FundAssetRow copyWithCompanion(FundAssetsCompanion data) {
+    return FundAssetRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1441,7 +1441,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
 
   @override
   String toString() {
-    return (StringBuffer('FundAsset(')
+    return (StringBuffer('FundAssetRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -1470,7 +1470,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FundAsset &&
+      (other is FundAssetRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
@@ -1482,7 +1482,7 @@ class FundAsset extends DataClass implements Insertable<FundAsset> {
           other.navUpdatedAt == this.navUpdatedAt);
 }
 
-class FundAssetsCompanion extends UpdateCompanion<FundAsset> {
+class FundAssetsCompanion extends UpdateCompanion<FundAssetRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
@@ -1521,7 +1521,7 @@ class FundAssetsCompanion extends UpdateCompanion<FundAsset> {
        fundCode = Value(fundCode),
        units = Value(units),
        avgCost = Value(avgCost);
-  static Insertable<FundAsset> custom({
+  static Insertable<FundAssetRow> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -1628,7 +1628,7 @@ class FundAssetsCompanion extends UpdateCompanion<FundAsset> {
 }
 
 class $CryptoAssetsTable extends CryptoAssets
-    with TableInfo<$CryptoAssetsTable, CryptoAsset> {
+    with TableInfo<$CryptoAssetsTable, CryptoAssetRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1747,7 +1747,7 @@ class $CryptoAssetsTable extends CryptoAssets
   static const String $name = 'crypto_assets';
   @override
   VerificationContext validateIntegrity(
-    Insertable<CryptoAsset> instance, {
+    Insertable<CryptoAssetRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1825,9 +1825,9 @@ class $CryptoAssetsTable extends CryptoAssets
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  CryptoAsset map(Map<String, dynamic> data, {String? tablePrefix}) {
+  CryptoAssetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return CryptoAsset(
+    return CryptoAssetRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1873,7 +1873,7 @@ class $CryptoAssetsTable extends CryptoAssets
   }
 }
 
-class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
+class CryptoAssetRow extends DataClass implements Insertable<CryptoAssetRow> {
   final String id;
   final String name;
   final DateTime createdAt;
@@ -1883,7 +1883,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
   final double avgCost;
   final double? currentPrice;
   final DateTime? priceUpdatedAt;
-  const CryptoAsset({
+  const CryptoAssetRow({
     required this.id,
     required this.name,
     required this.createdAt,
@@ -1931,12 +1931,12 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
     );
   }
 
-  factory CryptoAsset.fromJson(
+  factory CryptoAssetRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return CryptoAsset(
+    return CryptoAssetRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1964,7 +1964,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
     };
   }
 
-  CryptoAsset copyWith({
+  CryptoAssetRow copyWith({
     String? id,
     String? name,
     DateTime? createdAt,
@@ -1974,7 +1974,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
     double? avgCost,
     Value<double?> currentPrice = const Value.absent(),
     Value<DateTime?> priceUpdatedAt = const Value.absent(),
-  }) => CryptoAsset(
+  }) => CryptoAssetRow(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
@@ -1987,8 +1987,8 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
         ? priceUpdatedAt.value
         : this.priceUpdatedAt,
   );
-  CryptoAsset copyWithCompanion(CryptoAssetsCompanion data) {
-    return CryptoAsset(
+  CryptoAssetRow copyWithCompanion(CryptoAssetsCompanion data) {
+    return CryptoAssetRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2007,7 +2007,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
 
   @override
   String toString() {
-    return (StringBuffer('CryptoAsset(')
+    return (StringBuffer('CryptoAssetRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -2036,7 +2036,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is CryptoAsset &&
+      (other is CryptoAssetRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
@@ -2048,7 +2048,7 @@ class CryptoAsset extends DataClass implements Insertable<CryptoAsset> {
           other.priceUpdatedAt == this.priceUpdatedAt);
 }
 
-class CryptoAssetsCompanion extends UpdateCompanion<CryptoAsset> {
+class CryptoAssetsCompanion extends UpdateCompanion<CryptoAssetRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
@@ -2087,7 +2087,7 @@ class CryptoAssetsCompanion extends UpdateCompanion<CryptoAsset> {
        symbol = Value(symbol),
        amount = Value(amount),
        avgCost = Value(avgCost);
-  static Insertable<CryptoAsset> custom({
+  static Insertable<CryptoAssetRow> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -2194,7 +2194,7 @@ class CryptoAssetsCompanion extends UpdateCompanion<CryptoAsset> {
 }
 
 class $DailySnapshotsTable extends DailySnapshots
-    with TableInfo<$DailySnapshotsTable, DailySnapshot> {
+    with TableInfo<$DailySnapshotsTable, DailySnapshotRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2283,7 +2283,7 @@ class $DailySnapshotsTable extends DailySnapshots
   static const String $name = 'daily_snapshots';
   @override
   VerificationContext validateIntegrity(
-    Insertable<DailySnapshot> instance, {
+    Insertable<DailySnapshotRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2337,9 +2337,9 @@ class $DailySnapshotsTable extends DailySnapshots
   @override
   Set<GeneratedColumn> get $primaryKey => {date};
   @override
-  DailySnapshot map(Map<String, dynamic> data, {String? tablePrefix}) {
+  DailySnapshotRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DailySnapshot(
+    return DailySnapshotRow(
       date: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}date'],
@@ -2373,14 +2373,15 @@ class $DailySnapshotsTable extends DailySnapshots
   }
 }
 
-class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
+class DailySnapshotRow extends DataClass
+    implements Insertable<DailySnapshotRow> {
   final String date;
   final double totalValue;
   final double cashValue;
   final double stockValue;
   final double fundValue;
   final double cryptoValue;
-  const DailySnapshot({
+  const DailySnapshotRow({
     required this.date,
     required this.totalValue,
     required this.cashValue,
@@ -2411,12 +2412,12 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
     );
   }
 
-  factory DailySnapshot.fromJson(
+  factory DailySnapshotRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DailySnapshot(
+    return DailySnapshotRow(
       date: serializer.fromJson<String>(json['date']),
       totalValue: serializer.fromJson<double>(json['totalValue']),
       cashValue: serializer.fromJson<double>(json['cashValue']),
@@ -2438,14 +2439,14 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
     };
   }
 
-  DailySnapshot copyWith({
+  DailySnapshotRow copyWith({
     String? date,
     double? totalValue,
     double? cashValue,
     double? stockValue,
     double? fundValue,
     double? cryptoValue,
-  }) => DailySnapshot(
+  }) => DailySnapshotRow(
     date: date ?? this.date,
     totalValue: totalValue ?? this.totalValue,
     cashValue: cashValue ?? this.cashValue,
@@ -2453,8 +2454,8 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
     fundValue: fundValue ?? this.fundValue,
     cryptoValue: cryptoValue ?? this.cryptoValue,
   );
-  DailySnapshot copyWithCompanion(DailySnapshotsCompanion data) {
-    return DailySnapshot(
+  DailySnapshotRow copyWithCompanion(DailySnapshotsCompanion data) {
+    return DailySnapshotRow(
       date: data.date.present ? data.date.value : this.date,
       totalValue: data.totalValue.present
           ? data.totalValue.value
@@ -2472,7 +2473,7 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
 
   @override
   String toString() {
-    return (StringBuffer('DailySnapshot(')
+    return (StringBuffer('DailySnapshotRow(')
           ..write('date: $date, ')
           ..write('totalValue: $totalValue, ')
           ..write('cashValue: $cashValue, ')
@@ -2495,7 +2496,7 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is DailySnapshot &&
+      (other is DailySnapshotRow &&
           other.date == this.date &&
           other.totalValue == this.totalValue &&
           other.cashValue == this.cashValue &&
@@ -2504,7 +2505,7 @@ class DailySnapshot extends DataClass implements Insertable<DailySnapshot> {
           other.cryptoValue == this.cryptoValue);
 }
 
-class DailySnapshotsCompanion extends UpdateCompanion<DailySnapshot> {
+class DailySnapshotsCompanion extends UpdateCompanion<DailySnapshotRow> {
   final Value<String> date;
   final Value<double> totalValue;
   final Value<double> cashValue;
@@ -2531,7 +2532,7 @@ class DailySnapshotsCompanion extends UpdateCompanion<DailySnapshot> {
     this.rowid = const Value.absent(),
   }) : date = Value(date),
        totalValue = Value(totalValue);
-  static Insertable<DailySnapshot> custom({
+  static Insertable<DailySnapshotRow> custom({
     Expression<String>? date,
     Expression<double>? totalValue,
     Expression<double>? cashValue,
@@ -2614,7 +2615,7 @@ class DailySnapshotsCompanion extends UpdateCompanion<DailySnapshot> {
 }
 
 class $ExchangeRatesTable extends ExchangeRates
-    with TableInfo<$ExchangeRatesTable, ExchangeRate> {
+    with TableInfo<$ExchangeRatesTable, ExchangeRateRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2689,7 +2690,7 @@ class $ExchangeRatesTable extends ExchangeRates
   static const String $name = 'exchange_rates';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ExchangeRate> instance, {
+    Insertable<ExchangeRateRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2738,9 +2739,9 @@ class $ExchangeRatesTable extends ExchangeRates
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ExchangeRate map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ExchangeRateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ExchangeRate(
+    return ExchangeRateRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -2770,13 +2771,13 @@ class $ExchangeRatesTable extends ExchangeRates
   }
 }
 
-class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
+class ExchangeRateRow extends DataClass implements Insertable<ExchangeRateRow> {
   final int id;
   final String fromCurrency;
   final String toCurrency;
   final double rate;
   final DateTime fetchedAt;
-  const ExchangeRate({
+  const ExchangeRateRow({
     required this.id,
     required this.fromCurrency,
     required this.toCurrency,
@@ -2804,12 +2805,12 @@ class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
     );
   }
 
-  factory ExchangeRate.fromJson(
+  factory ExchangeRateRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ExchangeRate(
+    return ExchangeRateRow(
       id: serializer.fromJson<int>(json['id']),
       fromCurrency: serializer.fromJson<String>(json['fromCurrency']),
       toCurrency: serializer.fromJson<String>(json['toCurrency']),
@@ -2829,21 +2830,21 @@ class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
     };
   }
 
-  ExchangeRate copyWith({
+  ExchangeRateRow copyWith({
     int? id,
     String? fromCurrency,
     String? toCurrency,
     double? rate,
     DateTime? fetchedAt,
-  }) => ExchangeRate(
+  }) => ExchangeRateRow(
     id: id ?? this.id,
     fromCurrency: fromCurrency ?? this.fromCurrency,
     toCurrency: toCurrency ?? this.toCurrency,
     rate: rate ?? this.rate,
     fetchedAt: fetchedAt ?? this.fetchedAt,
   );
-  ExchangeRate copyWithCompanion(ExchangeRatesCompanion data) {
-    return ExchangeRate(
+  ExchangeRateRow copyWithCompanion(ExchangeRatesCompanion data) {
+    return ExchangeRateRow(
       id: data.id.present ? data.id.value : this.id,
       fromCurrency: data.fromCurrency.present
           ? data.fromCurrency.value
@@ -2858,7 +2859,7 @@ class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
 
   @override
   String toString() {
-    return (StringBuffer('ExchangeRate(')
+    return (StringBuffer('ExchangeRateRow(')
           ..write('id: $id, ')
           ..write('fromCurrency: $fromCurrency, ')
           ..write('toCurrency: $toCurrency, ')
@@ -2874,7 +2875,7 @@ class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ExchangeRate &&
+      (other is ExchangeRateRow &&
           other.id == this.id &&
           other.fromCurrency == this.fromCurrency &&
           other.toCurrency == this.toCurrency &&
@@ -2882,7 +2883,7 @@ class ExchangeRate extends DataClass implements Insertable<ExchangeRate> {
           other.fetchedAt == this.fetchedAt);
 }
 
-class ExchangeRatesCompanion extends UpdateCompanion<ExchangeRate> {
+class ExchangeRatesCompanion extends UpdateCompanion<ExchangeRateRow> {
   final Value<int> id;
   final Value<String> fromCurrency;
   final Value<String> toCurrency;
@@ -2905,7 +2906,7 @@ class ExchangeRatesCompanion extends UpdateCompanion<ExchangeRate> {
        toCurrency = Value(toCurrency),
        rate = Value(rate),
        fetchedAt = Value(fetchedAt);
-  static Insertable<ExchangeRate> custom({
+  static Insertable<ExchangeRateRow> custom({
     Expression<int>? id,
     Expression<String>? fromCurrency,
     Expression<String>? toCurrency,
@@ -3143,17 +3144,17 @@ class $$CashAssetsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $CashAssetsTable,
-          CashAsset,
+          CashAssetRow,
           $$CashAssetsTableFilterComposer,
           $$CashAssetsTableOrderingComposer,
           $$CashAssetsTableAnnotationComposer,
           $$CashAssetsTableCreateCompanionBuilder,
           $$CashAssetsTableUpdateCompanionBuilder,
           (
-            CashAsset,
-            BaseReferences<_$AppDatabase, $CashAssetsTable, CashAsset>,
+            CashAssetRow,
+            BaseReferences<_$AppDatabase, $CashAssetsTable, CashAssetRow>,
           ),
-          CashAsset,
+          CashAssetRow,
           PrefetchHooks Function()
         > {
   $$CashAssetsTableTableManager(_$AppDatabase db, $CashAssetsTable table)
@@ -3219,14 +3220,17 @@ typedef $$CashAssetsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $CashAssetsTable,
-      CashAsset,
+      CashAssetRow,
       $$CashAssetsTableFilterComposer,
       $$CashAssetsTableOrderingComposer,
       $$CashAssetsTableAnnotationComposer,
       $$CashAssetsTableCreateCompanionBuilder,
       $$CashAssetsTableUpdateCompanionBuilder,
-      (CashAsset, BaseReferences<_$AppDatabase, $CashAssetsTable, CashAsset>),
-      CashAsset,
+      (
+        CashAssetRow,
+        BaseReferences<_$AppDatabase, $CashAssetsTable, CashAssetRow>,
+      ),
+      CashAssetRow,
       PrefetchHooks Function()
     >;
 typedef $$StockAssetsTableCreateCompanionBuilder =
@@ -3427,17 +3431,17 @@ class $$StockAssetsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $StockAssetsTable,
-          StockAsset,
+          StockAssetRow,
           $$StockAssetsTableFilterComposer,
           $$StockAssetsTableOrderingComposer,
           $$StockAssetsTableAnnotationComposer,
           $$StockAssetsTableCreateCompanionBuilder,
           $$StockAssetsTableUpdateCompanionBuilder,
           (
-            StockAsset,
-            BaseReferences<_$AppDatabase, $StockAssetsTable, StockAsset>,
+            StockAssetRow,
+            BaseReferences<_$AppDatabase, $StockAssetsTable, StockAssetRow>,
           ),
-          StockAsset,
+          StockAssetRow,
           PrefetchHooks Function()
         > {
   $$StockAssetsTableTableManager(_$AppDatabase db, $StockAssetsTable table)
@@ -3515,17 +3519,17 @@ typedef $$StockAssetsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $StockAssetsTable,
-      StockAsset,
+      StockAssetRow,
       $$StockAssetsTableFilterComposer,
       $$StockAssetsTableOrderingComposer,
       $$StockAssetsTableAnnotationComposer,
       $$StockAssetsTableCreateCompanionBuilder,
       $$StockAssetsTableUpdateCompanionBuilder,
       (
-        StockAsset,
-        BaseReferences<_$AppDatabase, $StockAssetsTable, StockAsset>,
+        StockAssetRow,
+        BaseReferences<_$AppDatabase, $StockAssetsTable, StockAssetRow>,
       ),
-      StockAsset,
+      StockAssetRow,
       PrefetchHooks Function()
     >;
 typedef $$FundAssetsTableCreateCompanionBuilder =
@@ -3711,17 +3715,17 @@ class $$FundAssetsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $FundAssetsTable,
-          FundAsset,
+          FundAssetRow,
           $$FundAssetsTableFilterComposer,
           $$FundAssetsTableOrderingComposer,
           $$FundAssetsTableAnnotationComposer,
           $$FundAssetsTableCreateCompanionBuilder,
           $$FundAssetsTableUpdateCompanionBuilder,
           (
-            FundAsset,
-            BaseReferences<_$AppDatabase, $FundAssetsTable, FundAsset>,
+            FundAssetRow,
+            BaseReferences<_$AppDatabase, $FundAssetsTable, FundAssetRow>,
           ),
-          FundAsset,
+          FundAssetRow,
           PrefetchHooks Function()
         > {
   $$FundAssetsTableTableManager(_$AppDatabase db, $FundAssetsTable table)
@@ -3795,14 +3799,17 @@ typedef $$FundAssetsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $FundAssetsTable,
-      FundAsset,
+      FundAssetRow,
       $$FundAssetsTableFilterComposer,
       $$FundAssetsTableOrderingComposer,
       $$FundAssetsTableAnnotationComposer,
       $$FundAssetsTableCreateCompanionBuilder,
       $$FundAssetsTableUpdateCompanionBuilder,
-      (FundAsset, BaseReferences<_$AppDatabase, $FundAssetsTable, FundAsset>),
-      FundAsset,
+      (
+        FundAssetRow,
+        BaseReferences<_$AppDatabase, $FundAssetsTable, FundAssetRow>,
+      ),
+      FundAssetRow,
       PrefetchHooks Function()
     >;
 typedef $$CryptoAssetsTableCreateCompanionBuilder =
@@ -3988,17 +3995,17 @@ class $$CryptoAssetsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $CryptoAssetsTable,
-          CryptoAsset,
+          CryptoAssetRow,
           $$CryptoAssetsTableFilterComposer,
           $$CryptoAssetsTableOrderingComposer,
           $$CryptoAssetsTableAnnotationComposer,
           $$CryptoAssetsTableCreateCompanionBuilder,
           $$CryptoAssetsTableUpdateCompanionBuilder,
           (
-            CryptoAsset,
-            BaseReferences<_$AppDatabase, $CryptoAssetsTable, CryptoAsset>,
+            CryptoAssetRow,
+            BaseReferences<_$AppDatabase, $CryptoAssetsTable, CryptoAssetRow>,
           ),
-          CryptoAsset,
+          CryptoAssetRow,
           PrefetchHooks Function()
         > {
   $$CryptoAssetsTableTableManager(_$AppDatabase db, $CryptoAssetsTable table)
@@ -4072,17 +4079,17 @@ typedef $$CryptoAssetsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $CryptoAssetsTable,
-      CryptoAsset,
+      CryptoAssetRow,
       $$CryptoAssetsTableFilterComposer,
       $$CryptoAssetsTableOrderingComposer,
       $$CryptoAssetsTableAnnotationComposer,
       $$CryptoAssetsTableCreateCompanionBuilder,
       $$CryptoAssetsTableUpdateCompanionBuilder,
       (
-        CryptoAsset,
-        BaseReferences<_$AppDatabase, $CryptoAssetsTable, CryptoAsset>,
+        CryptoAssetRow,
+        BaseReferences<_$AppDatabase, $CryptoAssetsTable, CryptoAssetRow>,
       ),
-      CryptoAsset,
+      CryptoAssetRow,
       PrefetchHooks Function()
     >;
 typedef $$DailySnapshotsTableCreateCompanionBuilder =
@@ -4225,17 +4232,21 @@ class $$DailySnapshotsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $DailySnapshotsTable,
-          DailySnapshot,
+          DailySnapshotRow,
           $$DailySnapshotsTableFilterComposer,
           $$DailySnapshotsTableOrderingComposer,
           $$DailySnapshotsTableAnnotationComposer,
           $$DailySnapshotsTableCreateCompanionBuilder,
           $$DailySnapshotsTableUpdateCompanionBuilder,
           (
-            DailySnapshot,
-            BaseReferences<_$AppDatabase, $DailySnapshotsTable, DailySnapshot>,
+            DailySnapshotRow,
+            BaseReferences<
+              _$AppDatabase,
+              $DailySnapshotsTable,
+              DailySnapshotRow
+            >,
           ),
-          DailySnapshot,
+          DailySnapshotRow,
           PrefetchHooks Function()
         > {
   $$DailySnapshotsTableTableManager(
@@ -4299,17 +4310,17 @@ typedef $$DailySnapshotsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $DailySnapshotsTable,
-      DailySnapshot,
+      DailySnapshotRow,
       $$DailySnapshotsTableFilterComposer,
       $$DailySnapshotsTableOrderingComposer,
       $$DailySnapshotsTableAnnotationComposer,
       $$DailySnapshotsTableCreateCompanionBuilder,
       $$DailySnapshotsTableUpdateCompanionBuilder,
       (
-        DailySnapshot,
-        BaseReferences<_$AppDatabase, $DailySnapshotsTable, DailySnapshot>,
+        DailySnapshotRow,
+        BaseReferences<_$AppDatabase, $DailySnapshotsTable, DailySnapshotRow>,
       ),
-      DailySnapshot,
+      DailySnapshotRow,
       PrefetchHooks Function()
     >;
 typedef $$ExchangeRatesTableCreateCompanionBuilder =
@@ -4433,17 +4444,17 @@ class $$ExchangeRatesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ExchangeRatesTable,
-          ExchangeRate,
+          ExchangeRateRow,
           $$ExchangeRatesTableFilterComposer,
           $$ExchangeRatesTableOrderingComposer,
           $$ExchangeRatesTableAnnotationComposer,
           $$ExchangeRatesTableCreateCompanionBuilder,
           $$ExchangeRatesTableUpdateCompanionBuilder,
           (
-            ExchangeRate,
-            BaseReferences<_$AppDatabase, $ExchangeRatesTable, ExchangeRate>,
+            ExchangeRateRow,
+            BaseReferences<_$AppDatabase, $ExchangeRatesTable, ExchangeRateRow>,
           ),
-          ExchangeRate,
+          ExchangeRateRow,
           PrefetchHooks Function()
         > {
   $$ExchangeRatesTableTableManager(_$AppDatabase db, $ExchangeRatesTable table)
@@ -4497,17 +4508,17 @@ typedef $$ExchangeRatesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ExchangeRatesTable,
-      ExchangeRate,
+      ExchangeRateRow,
       $$ExchangeRatesTableFilterComposer,
       $$ExchangeRatesTableOrderingComposer,
       $$ExchangeRatesTableAnnotationComposer,
       $$ExchangeRatesTableCreateCompanionBuilder,
       $$ExchangeRatesTableUpdateCompanionBuilder,
       (
-        ExchangeRate,
-        BaseReferences<_$AppDatabase, $ExchangeRatesTable, ExchangeRate>,
+        ExchangeRateRow,
+        BaseReferences<_$AppDatabase, $ExchangeRatesTable, ExchangeRateRow>,
       ),
-      ExchangeRate,
+      ExchangeRateRow,
       PrefetchHooks Function()
     >;
 

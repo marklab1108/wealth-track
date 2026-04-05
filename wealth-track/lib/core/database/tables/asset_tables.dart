@@ -10,12 +10,14 @@ mixin AssetFields on Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('CashAssetRow')
 class CashAssets extends Table with AssetFields {
   TextColumn get currency => text()();
   TextColumn get bankName => text()();
   RealColumn get amount => real()();
 }
 
+@DataClassName('StockAssetRow')
 class StockAssets extends Table with AssetFields {
   TextColumn get symbol => text()();
   TextColumn get market => text()();
@@ -25,6 +27,7 @@ class StockAssets extends Table with AssetFields {
   DateTimeColumn get priceUpdatedAt => dateTime().nullable()();
 }
 
+@DataClassName('FundAssetRow')
 class FundAssets extends Table with AssetFields {
   TextColumn get fundCode => text()();
   RealColumn get units => real()();
@@ -33,6 +36,7 @@ class FundAssets extends Table with AssetFields {
   DateTimeColumn get navUpdatedAt => dateTime().nullable()();
 }
 
+@DataClassName('CryptoAssetRow')
 class CryptoAssets extends Table with AssetFields {
   TextColumn get symbol => text()();
   RealColumn get amount => real()();
@@ -41,6 +45,7 @@ class CryptoAssets extends Table with AssetFields {
   DateTimeColumn get priceUpdatedAt => dateTime().nullable()();
 }
 
+@DataClassName('DailySnapshotRow')
 class DailySnapshots extends Table {
   TextColumn get date => text()();
   RealColumn get totalValue => real()();
@@ -53,6 +58,7 @@ class DailySnapshots extends Table {
   Set<Column> get primaryKey => {date};
 }
 
+@DataClassName('ExchangeRateRow')
 class ExchangeRates extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get fromCurrency => text()();
