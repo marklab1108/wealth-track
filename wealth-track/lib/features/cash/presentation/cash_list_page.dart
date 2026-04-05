@@ -7,7 +7,9 @@ import '../../../core/utils/currency.dart';
 import 'providers/cash_provider.dart';
 
 class CashListPage extends ConsumerWidget {
-  const CashListPage({super.key});
+  final bool showAppBar;
+
+  const CashListPage({super.key, this.showAppBar = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,7 +17,7 @@ class CashListPage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('現金資產')),
+      appBar: showAppBar ? AppBar(title: const Text('現金資產')) : null,
       body: cashAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('載入失敗: $e')),

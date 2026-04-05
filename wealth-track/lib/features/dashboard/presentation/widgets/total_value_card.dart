@@ -9,7 +9,7 @@ class TotalValueCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final total = ref.watch(totalValueProvider);
+    final totalAsync = ref.watch(totalValueProvider);
     final theme = Theme.of(context);
 
     return Card(
@@ -24,10 +24,18 @@ class TotalValueCard extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              formatTWD(total),
-              style: theme.textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+            totalAsync.when(
+              loading: () => const SizedBox(
+                height: 36,
+                child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+              error: (_, _) => const Text('—'),
+              data: (total) => Text(
+                formatTWD(total),
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

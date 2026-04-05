@@ -8,7 +8,7 @@
 |-------|------|---------|------|
 | 1 | 基礎建設 | 1-2 天 | ✅ 完成 |
 | 2 | 台幣現金 CRUD | 1-2 天 | ✅ 完成 |
-| 3 | 美股 + 價格 API | 2-3 天 | ⬜ 未開始 |
+| 3 | 美股 + 價格 API | 2-3 天 | ✅ 完成 |
 | 4 | 台股 | 1-2 天 | ⬜ 未開始 |
 | 5 | 外幣 + 基金 + 加密貨幣 | 2-3 天 | ⬜ 未開始 |
 | 6 | 分析功能 | 2-3 天 | ⬜ 未開始 |
@@ -69,29 +69,58 @@
 
 ---
 
-## Phase 3: 美股 + 價格 API ⬜
+## Phase 3: 美股 + 價格 API ✅
 
 **目標：** 美股持倉 CRUD + Yahoo Finance 價格 API + 匯率換算
 
 **對應需求：** 需求 1, 2, 3b, 7
 
-| 項目 | 狀態 |
-|------|------|
-| 美股持倉 CRUD（代號/數量/成本/碎股） | ⬜ |
-| Yahoo Finance API 串接（primary） | ⬜ |
-| Alpha Vantage fallback | ⬜ |
-| 本地快取 15 分鐘 | ⬜ |
-| ExchangeRate-API 匯率串接 | ⬜ |
-| 美股市值計算（USD→TWD） | ⬜ |
-| 首頁更新：現金 + 美股總值 | ⬜ |
-| 資產分布圓餅圖（現金 vs 美股） | ⬜ |
-| 股票列表頁（當前價/成本/報酬率） | ⬜ |
-| 價格過期分級標示 | ⬜ |
+| 項目 | 狀態 | 產出檔案 |
+|------|------|---------|
+| Yahoo Finance API 服務（報價 + 股票名稱） | ✅ | `lib/features/price/data/yahoo_finance_service.dart` |
+| ExchangeRate-API 匯率服務 | ✅ | `lib/features/price/data/exchange_rate_service.dart` |
+| 匯率 DB 快取 Repository | ✅ | `lib/features/price/data/exchange_rate_repository.dart` |
+| Price Providers（yahoo, fx service, usdToTwd） | ✅ | `lib/features/price/providers/price_provider.dart` |
+| Stock Repository（CRUD + updatePrice） | ✅ | `lib/features/stock/data/stock_repository.dart` |
+| Stock Providers（watchAll, refresh + RefreshResult） | ✅ | `lib/features/stock/presentation/providers/stock_provider.dart` |
+| 刷新共用邏輯（失敗代號回報） | ✅ | `lib/features/stock/presentation/refresh_helper.dart` |
+| 美股列表頁（名稱優先/代號副標/報酬率/過期標示） | ✅ | `lib/features/stock/presentation/stock_list_page.dart` |
+| 美股新增/編輯表單（代號失焦自動帶入名稱） | ✅ | `lib/features/stock/presentation/stock_form_page.dart` |
+| 資產 Tab 重構（TabBar: 現金/美股） | ✅ | `lib/features/dashboard/presentation/assets_tab_page.dart` |
+| Dashboard 更新（總值 = 現金 + 美股 TWD） | ✅ | `lib/features/dashboard/presentation/dashboard_page.dart` |
+| Dashboard 資產明細卡（現金/美股分列） | ✅ | 同上 |
+| 圓餅圖改為依資產類型分布 | ✅ | `lib/features/dashboard/presentation/widgets/allocation_pie_chart.dart` |
+| 總值卡片改為 async（等匯率） | ✅ | `lib/features/dashboard/presentation/widgets/total_value_card.dart` |
+| 路由：`/assets/stock/add` + `/assets/stock/edit/:id` | ✅ | `lib/app/router.dart` |
+| http 依賴安裝 | ✅ | `pubspec.yaml` |
+| flutter analyze 0 issues | ✅ | — |
 
-**技術重點：**
-- Yahoo Finance unofficial API，台股用 `.TW` 後綴（如 `2330.TW`）
-- API 快取策略：股票 15 min、匯率 24h
-- 失敗時顯示上次快取價格 + 過期標示
+**功能流程：**
+1. 首頁顯示總資產（現金 + 美股折合 TWD）+ 資產明細卡（分列現金/美股金額）+ 圓餅圖（依類型）
+2. 首頁及美股 Tab 均有刷新按鈕 → 批次更新所有美股價格（Yahoo Finance API）
+3. 刷新結果明確回報：成功幾支、失敗的代號列出（如代號打錯會提示）
+4. 資產 Tab 用 TabBar 切換現金/美股，美股 Tab 右上角有刷新按鈕
+5. 美股列表標題顯示股票名稱（如 Apple Inc.），副標題顯示代號 + 股數 + 均價
+6. 點 FAB → 新增美股，輸入代號後離開欄位自動從 Yahoo Finance 帶入股票名稱
+7. 編輯時更改代號，名稱會自動更新為新代號對應的股票名稱
+8. 點任一筆 → 編輯，左滑刪除（含確認，顯示名稱+代號）
+9. 刷新價格時：15 分鐘內的價格不重複抓取
+
+**技術決策：**
+- 使用 `http` 套件（非 dio），保持輕量
+- Yahoo Finance Chart API（`/v8/finance/chart/{symbol}`）取得即時價格 + 股票名稱（`meta.shortName`）
+- `StockQuote` 類別封裝 symbol / shortName / price，`getQuote()` 統一回傳
+- ExchangeRate-API free tier（`open.er-api.com`）取 USD→TWD
+- 匯率 DB 快取 24 小時，股票價格快取 15 分鐘
+- API 失敗時 fallback 到最近一次快取價格
+- `RefreshResult` 類別區分 updated / requested / failed，刷新後明確回報失敗代號
+- `ref.invalidate()` 確保每次刷新都重新執行，不返回快取結果
+- `refresh_helper.dart` 共用邏輯，首頁和美股 Tab 共用同一套刷新 + 通知
+- Dashboard providers 改為 async（需等匯率 API），UI 加 loading indicator
+- `fold<double>()` 顯式泛型避免 async 函式中型別推斷為 `FutureOr`
+- 表單代號欄 `FocusNode` 監聽失焦事件，觸發 Yahoo Finance 自動查名稱
+- 列表 UI 名稱優先、代號放副標題（消費級理財 App 設計慣例）
+- Alpha Vantage fallback 留待後續需要時再加
 
 ---
 
@@ -174,12 +203,12 @@ wealth-track/              (repo root)
 │   │   │   ├── providers/ (database_provider.dart)
 │   │   │   └── utils/     (currency.dart, staleness.dart)
 │   │   ├── features/
-│   │   │   ├── dashboard/presentation/ (dashboard_page, widgets/, providers/)
+│   │   │   ├── dashboard/presentation/ (dashboard_page, assets_tab_page, widgets/, providers/)
 │   │   │   ├── cash/      (data/cash_repository, presentation/cash_list_page, cash_form_page, providers/)
-│   │   │   ├── stock/     (目錄已建，待 Phase 3 實作)
+│   │   │   ├── stock/     (data/stock_repository, presentation/stock_list_page, stock_form_page, refresh_helper, providers/)
+│   │   │   ├── price/     (data/yahoo_finance_service, exchange_rate_service, exchange_rate_repository, providers/)
 │   │   │   ├── fund/      (目錄已建，待 Phase 5 實作)
 │   │   │   ├── crypto/    (目錄已建，待 Phase 5 實作)
-│   │   │   ├── price/     (目錄已建，待 Phase 3 實作)
 │   │   │   └── settings/  (settings_page — 版本資訊)
 │   │   └── main.dart
 │   ├── pubspec.yaml
@@ -195,6 +224,7 @@ wealth-track/              (repo root)
 | 本地 DB | drift | ^2.22.1 |
 | 狀態管理 | flutter_riverpod + riverpod_annotation | ^2.6.1 |
 | 路由 | go_router | ^14.8.1 |
+| HTTP | http | ^1.2.2 |
 | 圖表 | fl_chart | ^0.70.2 |
 | Code Gen | build_runner + drift_dev + riverpod_generator | — |
 | 測試 | flutter_test + mocktail | — |

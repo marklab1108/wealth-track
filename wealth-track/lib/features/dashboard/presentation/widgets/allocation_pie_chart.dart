@@ -21,7 +21,7 @@ class AllocationPieChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(assetAllocationProvider);
+    final allocationAsync = ref.watch(assetAllocationProvider);
     final theme = Theme.of(context);
 
     return Card(
@@ -36,20 +36,33 @@ class AllocationPieChart extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            if (data.isEmpty)
-              SizedBox(
+            allocationAsync.when(
+              loading: () => const SizedBox(
                 height: 200,
                 child: Center(
-                  child: Text(
-                    '新增你的第一筆資產',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+              error: (_, _) => const SizedBox(
+                height: 200,
+                child: Center(child: Text('—')),
+              ),
+              data: (data) {
+                if (data.isEmpty) {
+                  return SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: Text(
+                        '新增你的第一筆資產',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
-            else
-              _buildChart(data, theme),
+                  );
+                }
+                return _buildChart(data, theme);
+              },
+            ),
           ],
         ),
       ),
